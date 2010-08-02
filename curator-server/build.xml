@@ -32,7 +32,7 @@
 
 	<target name="build" depends="compile" description="alias for compile" />
 
-	<target name="rebuild" depends="clean,compile" description="clean everything and recompile (requires thrift)" />
+	<target name="rebuild" depends="clean,compile" description="clean everything and recompile" />
 
 	<target name="print-run-server" depends="compile" description="print a run java command to run a server, requires the following properties: -Dservername, -Dhandler, -Dport, -Dthreads, -Dargument">
 		<echo>java -server -Dservername=${servername} -Xmx2000m -classpath ${project.classpath} edu.illinois.cs.cogcomp.server.ThriftServer -handler ${handler} -port ${port} -threads ${threads} ${argument}</echo>
