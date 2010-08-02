@@ -1,0 +1,28 @@
+<configuration scan="true">
+
+<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+  <layout class="ch.qos.logback.classic.PatternLayout">
+      <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+    </layout>
+</appender>
+
+<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <File>logs/${servername:-unknown}.log</File>
+  <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>${filelevel:-WARN}</level>
+  </filter>
+  <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+    <FileNamePattern>logs/dated/${servername:-unknown}.%d{yyyy-MM-dd}.log</FileNamePattern>
+    <MaxHistory>30</MaxHistory>
+  </rollingPolicy>
+  
+  <layout class="ch.qos.logback.classic.PatternLayout">
+    <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n</Pattern>
+  </layout>
+</appender>
+
+<root level="${loggerlevel:-INFO}">
+  <appender-ref ref="STDOUT" />
+  <appender-ref ref="FILE" />
+</root>
+</configuration>

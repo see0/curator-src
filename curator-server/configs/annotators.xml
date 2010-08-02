@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<curator-annotators>
+<annotator>
+  <type>multilabeler</type>
+  <field>sentences</field>
+  <field>tokens</field>
+  <local>edu.illinois.cs.cogcomp.annotation.handler.IllinoisTokenizerHandler</local>
+</annotator>
+
+<annotator>
+  <type>labeler</type>
+  <field>pos</field>
+  <host>greedy.cs.uiuc.edu:9081</host>
+  <requirements>sentences:tokens</requirements>
+</annotator>
+
+<annotator>
+  <type>labeler</type>
+  <field>chunk</field>
+  <host>greedy.cs.uiuc.edu:9085</host>
+  <requirements>sentences:tokens:pos</requirements>
+</annotator>
+
+<annotator>
+  <type>labeler</type>
+  <field>ner</field>
+  <host>greedy.cs.uiuc.edu:9082</host>
+</annotator>
+
+<annotator>
+  <type>labeler</type>
+  <field>quantities</field>
+  <host>greedy.cs.uiuc.edu:9087</host>
+  <requirements>sentences:tokens:pos</requirements>
+</annotator>
+
+<annotator>
+  <type>clustergenerator</type>
+  <field>coref</field>
+  <host>greedy.cs.uiuc.edu:9083</host>
+  <requirements>sentences:tokens:pos:ner</requirements>
+</annotator>
+
+<annotator>
+  <type>parser</type>
+  <field>charniak</field>
+  <host>greedy.cs.uiuc.edu:4457</host>
+  <host>smeagol.cs.uiuc.edu:4457</host>
+  <requirements>sentences:tokens</requirements>
+</annotator>
+
+<annotator>
+  <type>multiparser</type>
+  <field>stanfordParse</field>
+  <field>stanfordDep</field>
+  <host>greedy.cs.uiuc.edu:9084</host>
+  <requirements>sentences:tokens</requirements>
+</annotator>
+
+<annotator>
+  <type>labeler</type>
+  <field>wiki</field>
+  <host>gargamel.cs.uiuc.edu:9090</host>
+  <requirements>ner</requirements>
+</annotator>
+
+<annotator>
+  <type>legacySRL</type>
+  <field>srl</field>
+  <host>smeagol.cs.uiuc.edu:13710</host>
+  <requirements>sentences:tokens</requirements>
+</annotator>
+
+<annotator>
+  <type>legacySRL</type>
+  <field>nom</field>
+  <host>smeagol.cs.uiuc.edu:13810</host>
+  <requirements>sentences:tokens</requirements>
+</annotator>
+</curator-annotators>

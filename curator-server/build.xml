@@ -1,0 +1,75 @@
+<project name="curator" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+	<property name="src" location="src" />
+	<property name="build" location="bin" />
+	<property name="dist" location="dist" />
+
+	<target name="resolve" description="retrieve dependencies with ivy" depends="init-ivy">
+		<ivy:retrieve pattern="../lib/[artifact]-[revision].[ext]" />
+	</target>
+
+	<path id="project.class.path">
+		<pathelement path="${build}" />
+		<pathelement path="configs" />
+        <pathelement path="../curator-interfaces/dist/curator-interfaces.jar"/>
+		<fileset dir="../lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<property name="thecp" refid="project.class.path" />
+
+	<property name="argument" value="" />
+
+	<target name="compile" description="compile the curator java files" depends="resolve">
+		<mkdir dir="${build}" />
+		<javac srcdir="${src}" destdir="${build}" debug="true" classpathref="project.class.path" />
+	</target>
+
+	<target name="clean" description="removes all java compiled files">
+		<delete dir="${build}" />
+	</target>
+
+	<target name="build" depends="compile" description="alias for compile" />
+
+	<target name="rebuild" depends="clean,compile" description="clean everything and recompile (requires thrift)" />
+
+	<target name="print-run-server" depends="compile" description="print a run java command to run a server, requires the following properties: -Dservername, -Dhandler, -Dport, -Dthreads, -Dargument">
+		<echo>java -server -Dservername=${servername} -Xmx2000m -classpath ${thecp} edu.illinois.cs.cogcomp.server.ThriftServer -handler ${handler} -port ${port} -threads ${threads} ${argument}</echo>
+	</target>
+
+	<target name="dist" description="creates a jar of the project in dist/">
+		<mkdir dir="${dist}" />
+		<jar destfile="${dist}/curator.jar">
+			<fileset dir="${build}" />
+			<fileset dir="${src}" />
+		</jar>
+	</target>
+
+	<property name="ivy.install.version" value="2.1.0" />
+	<condition property="ivy.home" value="${env.IVY_HOME}">
+		<isset property="env.IVY_HOME" />
+	</condition>
+
+	<property name="ivy.home" value="${user.home}/.ant" />
+	<property name="ivy.jar.dir" value="${ivy.home}/lib" />
+	<property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+
+	<target name="download-ivy" unless="offline">
+		<mkdir dir="${ivy.jar.dir}" />
+		<!-- download Ivy from web site so that it can be used even without any special installation -->
+		<get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true" />
+	</target>
+
+	<target name="init-ivy" depends="download-ivy">
+		<!-- try to load ivy here from ivy home, in case the user has not already dropped
+              it into ant's lib dir (note that the latter copy will always take precedence).
+              We will not fail as long as local lib dir exists (it may be empty) and
+              ivy is in at least one of ant's lib dir or the local lib dir. -->
+		<path id="ivy.lib.path">
+			<fileset dir="${ivy.jar.dir}" includes="*.jar" />
+		</path>
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
+	</target>
+
+</project>
+
