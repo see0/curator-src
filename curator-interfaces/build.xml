@@ -6,12 +6,12 @@
 
 
 	<target name="resolve" description="retrieve dependencies with ivy" depends="init-ivy">
-		<ivy:retrieve />
+      <ivy:retrieve pattern="../lib/[artifact]-[revision].[ext]" />
 	</target>
 
 	<path id="project.class.path">
 		<pathelement path="${thrift-gen-java}" />
-		<fileset dir="lib">
+		<fileset dir="../lib">
 			<include name="*.jar" />
 		</fileset>
 	</path>
