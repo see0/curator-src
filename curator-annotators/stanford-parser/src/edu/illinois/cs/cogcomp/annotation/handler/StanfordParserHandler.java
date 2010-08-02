@@ -87,6 +87,7 @@ public class StanfordParserHandler implements MultiParser.Iface {
 				input = s;
 			} else {
 				input = rawsent;
+				offset = sentence.getStart();
 			}
 			edu.stanford.nlp.trees.Tree parse = parse(input);
 			for (edu.stanford.nlp.trees.Tree pt : parse.getChildrenAsList()) {

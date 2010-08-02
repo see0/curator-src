@@ -108,6 +108,7 @@ public class KBestStanfordParserHandler implements KBestParser.Iface {
 				input = s;
 			} else {
 				input = rawsent;
+				offset = sentence.getStart();
 			}
 			List<ScoredObject<edu.stanford.nlp.trees.Tree>> kParses = parseK(
 					input, k);
