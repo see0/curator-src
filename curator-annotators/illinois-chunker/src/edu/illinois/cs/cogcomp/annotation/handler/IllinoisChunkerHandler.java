@@ -1,8 +1,12 @@
 package edu.illinois.cs.cogcomp.annotation.handler;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -30,6 +34,27 @@ public class IllinoisChunkerHandler implements Labeler.Iface {
 	private String tokensfield = "tokens";
 	private String sentencesfield = "sentences";
 
+	public IllinoisChunkerHandler() {
+		this("configs/chunker.properties");
+	}
+	
+	public IllinoisChunkerHandler(String configFilename) {
+		if (configFilename.trim().equals("")) {
+			configFilename = "configs/chunker.properties";
+		}
+		Properties config = new Properties();
+		try {
+            FileInputStream in = new FileInputStream(configFilename);
+            config.load(new BufferedInputStream(in));
+            in.close();
+        } catch (IOException e) {
+			logger.warn("Error reading configuration file. {}", e);
+        }
+		tokensfield = config.getProperty("tokens.field", "tokens");
+		sentencesfield = config.getProperty("sentences.field", "sentences");
+		posfield = config.getProperty("pos.field", "sentences");
+	}
+	
 	public Labeling labelRecord(Record record) throws AnnotationFailedException,
 			TException {
 		if (!record.getLabelViews().containsKey(tokensfield) && !record.getLabelViews().containsKey(sentencesfield)) {

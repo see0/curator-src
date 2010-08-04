@@ -35,6 +35,10 @@ public class IllinoisNERHandler implements Labeler.Iface {
 	private NETaggerLevel1 t1;
 	private NETaggerLevel2 t2;
 
+	public IllinoisNERHandler() {
+		this("configs/ner.config");
+	}
+	
 	public IllinoisNERHandler(String params) {
 		Parameters.readConfigAndLoadExternalData(params);
 		Parameters.forceNewSentenceOnLineBreaks = false;

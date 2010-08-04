@@ -1,13 +1,14 @@
 package edu.illinois.cs.cogcomp.annotation.handler;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.TreeMap;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +38,34 @@ public class KBestStanfordParserHandler implements KBestParser.Iface {
 	private boolean useTokens = true;
 
 	public KBestStanfordParserHandler() {
-		Configuration config = null;
+		this("configs/stanford.properties");
+	}
+
+	public KBestStanfordParserHandler(String configFilename) {
+		if (configFilename.trim().equals("")) {
+			configFilename = "configs/stanford.properties";
+		}
+		Properties config = new Properties();
+
 		try {
-			config = new PropertiesConfiguration("configs/stanford.properties");
-		} catch (ConfigurationException e) {
+			FileInputStream in = new FileInputStream(configFilename);
+			config.load(new BufferedInputStream(in));
+			in.close();
+		} catch (IOException e) {
 			logger.warn("Error reading configuration file. {}", e);
 		}
-		String data = config.getString("stanford.data",
+
+		String data = config.getProperty("stanford.data",
 				"data/englishPCFG.ser.gz");
+
+		tokensfield = config.getProperty("tokens.field", "tokens");
+		sentencesfield = config.getProperty("sentences.field", "sentences");
+
+		if (config.getProperty("usetokens", "true").equals("false")) {
+			useTokens = false;
+		} else {
+			useTokens = true;
+		}
 		parser = new LexicalizedParser(data);
 		parser.setOptionFlags(new String[] { "-retainTmpSubcategories" });
 	}

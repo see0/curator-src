@@ -1,7 +1,11 @@
 package edu.illinois.cs.cogcomp.annotation.handler;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.thrift.TException;
@@ -47,6 +51,29 @@ public class IllinoisCorefHandler implements ClusterGenerator.Iface {
 	private String posfield = "pos";
 
 	public IllinoisCorefHandler() {
+		this("");
+	}
+	
+	public IllinoisCorefHandler(String configFilename) {
+		if (configFilename.trim().equals("")) {
+			configFilename = "configs/coref.properties";
+		}
+		Properties config = new Properties();
+		try {
+            FileInputStream in = new FileInputStream(configFilename);
+            config.load(new BufferedInputStream(in));
+            in.close();
+        } catch (IOException e) {
+			logger.warn("Error reading configuration file. {}", e);
+        }
+		tokensfield = config.getProperty("tokens.field", "tokens");
+		sentencesfield = config.getProperty("sentences.field", "sentences");
+		posfield = config.getProperty("pos.field", "sentences");
+		nerfield = config.getProperty("ner.field", "ner");
+		loadCorefSystem();
+	}
+
+	private void loadCorefSystem() {
 		logger.info("Loading classifier");
 		corefClassifier = new Emnlp8();
 		corefClassifier.setThreshold(-8.0);
@@ -61,7 +88,7 @@ public class IllinoisCorefHandler implements ClusterGenerator.Iface {
 		loader = new DocFromTextLoader(mDec, mTyper);
 		logger.info("Components loaded.");
 	}
-
+	
 	public boolean ping() throws TException {
 		return true;
 	}
