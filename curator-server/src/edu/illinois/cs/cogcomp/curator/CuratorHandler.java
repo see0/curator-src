@@ -71,6 +71,7 @@ public class CuratorHandler implements Curator.Iface {
 
 	private final Map<String, Pool> pools = new HashMap<String, Pool>();
 	private final Map<String, String> clientSourceIdentifiers = new ConcurrentHashMap<String, String>();
+	private final Map<String, String> clientNames = new ConcurrentHashMap<String, String>();
 	private final Map<String, List<String>> multiFields = new HashMap<String, List<String>>();
 	private final Map<String, List<String>> requirements = new HashMap<String, List<String>>();
 
@@ -232,9 +233,11 @@ public class CuratorHandler implements Curator.Iface {
 					for (String name : pools.keySet()) {
 						BaseService.Iface c = null;
 						String ident = null;
+						String serviceName = null;
 						try {
 							c = (BaseService.Iface) pools.get(name).getClient();
 							ident = c.getSourceIdentifier();
+							serviceName = c.getName();
 							pools.get(name).releaseClient(c);
 						} catch (TException e) {
 							logger.error(
@@ -249,6 +252,11 @@ public class CuratorHandler implements Curator.Iface {
 								|| !clientSourceIdentifiers.get(name).equals(
 										ident)) {
 							clientSourceIdentifiers.put(name, ident);
+						}
+						if (!clientNames.containsKey(name)
+								|| !clientNames.get(name).equals(
+										serviceName)) {
+							clientNames.put(name, serviceName);
 						}
 
 					}
@@ -426,6 +434,10 @@ public class CuratorHandler implements Curator.Iface {
 				record = new Record();
 				record.setRawText(text);
 				record.setWhitespaced(whitespaced);
+				record.setLabelViews(new HashMap<String, Labeling>());
+				record.setClusterViews(new HashMap<String, Clustering>());
+				record.setParseViews(new HashMap<String, Forest>());
+				record.setViews(new HashMap<String, View>());
 				record.setIdentifier(Identifier.getId(text, whitespaced));
 			}
 		}
@@ -746,7 +758,7 @@ public class CuratorHandler implements Curator.Iface {
 			Map<String, Labeling> labelViews = record.getLabelViews();
 			for (int i = 0; i < labelings.size(); i++) {
 				if (i >= fields.size()) {
-					logger.error(
+					logger.warn(
 							"Too many labelings returned by {} annotator; maybe not enough fields specified in annotators.xml?",
 							view_name);
 					break;
@@ -877,8 +889,22 @@ public class CuratorHandler implements Curator.Iface {
 	}
 
 	public Map<String, String> describeAnnotations() throws TException {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String, String> result = new HashMap<String, String>();
+		for (String view_name : pools.keySet()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(clientNames.get(view_name));
+			sb.append(" identifies as ");
+			sb.append(clientSourceIdentifiers.get(view_name));
+			String description = sb.toString();
+			if (multiFields.containsKey(view_name)) {
+				for (String v : multiFields.get(view_name)) {
+					result.put(v, description);
+				}
+			} else {
+				result.put(view_name, description);
+			}
+		}
+		return result;
 	}
 
 	public Record wsprovide(String view_name, List<String> sentences,
