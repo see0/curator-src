@@ -44,7 +44,7 @@ public class IllinoisCorefHandler implements ClusterGenerator.Iface {
 	private MTypePredictor mTyper;
 	private BestLinkDecoder decoder;
 	private Emnlp8 corefClassifier;
-	
+
 	private String nerfield = "ner";
 	private String tokensfield = "tokens";
 	private String sentencesfield = "sentences";
@@ -53,19 +53,19 @@ public class IllinoisCorefHandler implements ClusterGenerator.Iface {
 	public IllinoisCorefHandler() {
 		this("");
 	}
-	
+
 	public IllinoisCorefHandler(String configFilename) {
 		if (configFilename.trim().equals("")) {
 			configFilename = "configs/coref.properties";
 		}
 		Properties config = new Properties();
 		try {
-            FileInputStream in = new FileInputStream(configFilename);
-            config.load(new BufferedInputStream(in));
-            in.close();
-        } catch (IOException e) {
+			FileInputStream in = new FileInputStream(configFilename);
+			config.load(new BufferedInputStream(in));
+			in.close();
+		} catch (IOException e) {
 			logger.warn("Error reading configuration file. {}", e);
-        }
+		}
 		tokensfield = config.getProperty("tokens.field", "tokens");
 		sentencesfield = config.getProperty("sentences.field", "sentences");
 		posfield = config.getProperty("pos.field", "sentences");
@@ -88,7 +88,7 @@ public class IllinoisCorefHandler implements ClusterGenerator.Iface {
 		loader = new DocFromTextLoader(mDec, mTyper);
 		logger.info("Components loaded.");
 	}
-	
+
 	public boolean ping() throws TException {
 		return true;
 	}
@@ -178,7 +178,8 @@ public class IllinoisCorefHandler implements ClusterGenerator.Iface {
 				Labeling nes = record.getLabelViews().get(nerfield);
 				for (Span span : nes.getLabels()) {
 					Chunk c = new Chunk(doc, offset + span.getStart(), offset
-							+ span.getEnd() - 1, record.getRawText().substring(span.getStart(), span.getEnd()));
+							+ span.getEnd() - 1, record.getRawText().substring(
+							span.getStart(), span.getEnd()));
 					Mention m = new Mention(doc, c);
 					m.setType("NAM");
 					m.setEntityType(span.getLabel());
@@ -216,6 +217,5 @@ public class IllinoisCorefHandler implements ClusterGenerator.Iface {
 			logger.warn("Did not perform any adjustment on span.");
 		}
 	}
-
 
 }
