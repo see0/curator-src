@@ -2,11 +2,12 @@
 	<property name="src" location="src" />
 	<property name="build" location="bin" />
 	<property name="dist" location="dist" />
+    <property name="class.main" value="edu.illinois.cs.cogcomp.curator.CuratorServer"/>
+    <property name="memory" value="1000m" />
 
 	<target name="resolve" description="retrieve dependencies with ivy" depends="init-ivy">
 		<ivy:retrieve pattern="../lib/[artifact]-[revision].[ext]" />
         <ivy:cachepath pathid="dependencies.classpath" />
-
 	</target>
 
 	<path id="project.classpath">
@@ -15,7 +16,6 @@
         <pathelement path="../curator-interfaces/dist/curator-interfaces.jar"/>
         <pathelement path="../lib/libthrift.jar" />
         <path refid="dependencies.classpath" />
-
 	</path>
 
 
@@ -34,9 +34,10 @@
 
 	<target name="rebuild" depends="clean,compile" description="clean everything and recompile" />
 
-	<target name="print-run-server" depends="compile" description="print a run java command to run a server, requires the following properties: -Dservername, -Dhandler, -Dport, -Dthreads, -Dargument">
-		<echo>java -server -Dservername=${servername} -Xmx2000m -classpath ${project.classpath} edu.illinois.cs.cogcomp.server.ThriftServer -handler ${handler} -port ${port} -threads ${threads} ${argument}</echo>
-	</target>
+   <target name="print" description="print command line to run  the server" depends="compile">
+      <property name="thecp" refid="project.classpath" />
+      <echo>java -Xmx${memory} -classpath ${thecp} ${class.main}</echo>
+    </target>
 
 	<target name="dist" description="creates a jar of the project in dist/">
 		<mkdir dir="${dist}" />

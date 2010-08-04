@@ -65,6 +65,7 @@ public class CuratorHandler implements Curator.Iface {
 	private final Map<String, AtomicInteger> timers = new HashMap<String, AtomicInteger>();
 
 	private final boolean slave;
+	private final boolean writeaccess;
 	private final String masterHost;
 	private final int masterPort;
 
@@ -72,38 +73,46 @@ public class CuratorHandler implements Curator.Iface {
 	private final Map<String, String> clientSourceIdentifiers = new ConcurrentHashMap<String, String>();
 	private final Map<String, List<String>> multiFields = new HashMap<String, List<String>>();
 	private final Map<String, List<String>> requirements = new HashMap<String, List<String>>();
-	
+
 	private Archive archive;
 
 	public CuratorHandler() {
-		this("");
+		this("", "");
 	}
 
-	public CuratorHandler(String archiveClassname) {
+	public CuratorHandler(String propfn, String annotatorsfn) {
+		if (propfn.trim().equals("")) {
+			propfn = "configs/curator.properties";
+		}
+		if (annotatorsfn.trim().equals("")) {
+			annotatorsfn = "configs/annotators.xml";
+		}
 		Configuration config = null;
 		XMLConfiguration annotatorscfg = null;
 		try {
-			config = new PropertiesConfiguration("configs/curator.properties");
-			annotatorscfg = new XMLConfiguration("configs/annotators.xml");
+			config = new PropertiesConfiguration(propfn);
+			annotatorscfg = new XMLConfiguration(annotatorsfn);
 		} catch (ConfigurationException e) {
 			logger.error("Error reading configuration file. {}", e);
 			System.exit(1);
 		}
-		if (archiveClassname.trim().equals("")) {
-			archiveClassname = config.getString("archive");
-		}
+		String archiveClassname = config.getString("archive",
+				"edu.illinois.cs.cogcomp.archive.DatabaseArchive");
+
 		// initialize the archive class
 		init(archiveClassname);
 
 		// details if we are a slave
 		slave = config.getBoolean("curator.slave", false);
 
+		writeaccess = config.getBoolean("curator.writeaccess", false);
+
 		if (slave) {
 			String[] split = config.getString("servers.master").split(":");
 			masterHost = split[0];
 			masterPort = Integer.parseInt(split[1]);
-			logger.info("Curator is a slave to {}", config
-					.getString("servers.master"));
+			logger.info("Curator is a slave to {}",
+					config.getString("servers.master"));
 		} else {
 			masterHost = "";
 			masterPort = 0;
@@ -111,11 +120,12 @@ public class CuratorHandler implements Curator.Iface {
 
 		CLIENTTIMEOUT = config.getInt("client.timeout", 45) * 1000;
 
-		int CLIENTCOUNT = 1;  //how many clients per host:port combination
-		
+		int CLIENTCOUNT = 1; // how many clients per host:port combination
+
 		// lets create the client pools
 		if (!slave) {
-			List<HierarchicalConfiguration> annotators = annotatorscfg.configurationsAt("annotator");
+			List<HierarchicalConfiguration> annotators = annotatorscfg
+					.configurationsAt("annotator");
 			for (HierarchicalConfiguration annotator : annotators) {
 				ClientPool cpool = new ClientPool(CLIENTTIMEOUT);
 				Pool pool = null;
@@ -124,24 +134,28 @@ public class CuratorHandler implements Curator.Iface {
 				String[] fields = annotator.getStringArray("field");
 				String requirements = annotator.getString("requirements", "");
 				String local = annotator.getString("local", "");
-				
+
 				if (!local.equals("")) {
 					BaseService.Iface service = initClassInstance(local);
 					pool = new MockPool(service);
-				} if (type.equals("labeler")) {
+				}
+				if (type.equals("labeler")) {
 					cpool.addClients(hosts, CLIENTCOUNT, Labeler.Client.class);
 					pool = cpool;
 				} else if (type.equals("multilabeler")) {
-					cpool.addClients(hosts, CLIENTCOUNT, MultiLabeler.Client.class);
+					cpool.addClients(hosts, CLIENTCOUNT,
+							MultiLabeler.Client.class);
 					pool = cpool;
 				} else if (type.equals("clustergenerator")) {
-					cpool.addClients(hosts, CLIENTCOUNT, ClusterGenerator.Client.class);
+					cpool.addClients(hosts, CLIENTCOUNT,
+							ClusterGenerator.Client.class);
 					pool = cpool;
 				} else if (type.equals("parser")) {
 					cpool.addClients(hosts, CLIENTCOUNT, Parser.Client.class);
 					pool = cpool;
 				} else if (type.equals("multiparser")) {
-					cpool.addClients(hosts, CLIENTCOUNT, MultiParser.Client.class);
+					cpool.addClients(hosts, CLIENTCOUNT,
+							MultiParser.Client.class);
 					pool = cpool;
 				} else if (type.equals("legacySRL")) {
 					cpool.addLegacyClients(hosts, 1, SRLHandler.class);
@@ -150,21 +164,23 @@ public class CuratorHandler implements Curator.Iface {
 					logger.error("Unknown annotator type: {}", type);
 					logger.error("Exiting...");
 					System.exit(-1);
-				}//end if conditions
-				
+				}// end if conditions
+
 				for (int i = 0; i < fields.length; i++) {
 					String field = fields[i];
 					pools.put(field, pool);
 					counters.put(field, new AtomicInteger());
 					timers.put(field, new AtomicInteger());
-					//store requirements
-					this.requirements.put(field, Arrays.asList(requirements.split(":")));
-					//store information about fields when multiple annotations are returned by
-					//annotators
+					// store requirements
+					this.requirements.put(field,
+							Arrays.asList(requirements.split(":")));
+					// store information about fields when multiple annotations
+					// are returned by
+					// annotators
 					if (fields.length > 1) {
 						multiFields.put(field, Arrays.asList(fields));
 					}
-				}//end for fields
+				}// end for fields
 			}
 		}
 
@@ -221,7 +237,8 @@ public class CuratorHandler implements Curator.Iface {
 							ident = c.getSourceIdentifier();
 							pools.get(name).releaseClient(c);
 						} catch (TException e) {
-							logger.error("Error talking with client named {}: {}",
+							logger.error(
+									"Error talking with client named {}: {}",
 									name, e.getMessage());
 							if (c != null) {
 								pools.get(name).releaseClient(c);
@@ -282,7 +299,7 @@ public class CuratorHandler implements Curator.Iface {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Initializes the archive class
 	 * 
@@ -341,8 +358,8 @@ public class CuratorHandler implements Curator.Iface {
 		TProtocol protocol = new TBinaryProtocol(transport);
 		try {
 			Constructor<?> c = clientClass.getConstructor(TProtocol.class);
-			return new Pair<TTransport, Object>(transport, c
-					.newInstance(protocol));
+			return new Pair<TTransport, Object>(transport,
+					c.newInstance(protocol));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.exit(1);
@@ -371,8 +388,9 @@ public class CuratorHandler implements Curator.Iface {
 		return "curator-" + getVersion();
 	}
 
-	private Record getRecord(String text, boolean whitespaced) throws ServiceUnavailableException,
-			TException, AnnotationFailedException {
+	private Record getRecord(String text, boolean whitespaced)
+			throws ServiceUnavailableException, TException,
+			AnnotationFailedException {
 		if (text.trim().equals("")) {
 			throw new AnnotationFailedException(
 					"Cannot annotate the empty string");
@@ -446,17 +464,19 @@ public class CuratorHandler implements Curator.Iface {
 		removeStaleFields(record);
 		return record;
 	}
-	
+
 	/**
 	 * Removes any field that was produced by an old annotator.
+	 * 
 	 * @param record
 	 */
 	private void removeStaleFields(MultiRecord record) {
 
 	}
-	
+
 	/**
 	 * Removes any field that was produced by an old annotator.
+	 * 
 	 * @param record
 	 */
 	private void removeStaleFields(Record record) {
@@ -465,7 +485,7 @@ public class CuratorHandler implements Curator.Iface {
 		removeStaleFields(record, record.getParseViews());
 		removeStaleFields(record, record.getViews());
 	}
-	
+
 	private void removeStaleFields(Record record, Map<String, ?> views) {
 		for (Iterator<String> it = views.keySet().iterator(); it.hasNext();) {
 			String view_name = it.next();
@@ -476,12 +496,15 @@ public class CuratorHandler implements Curator.Iface {
 		}
 	}
 
-	public void storeRecord(Record record) throws ServiceSecurityException, TException {
-		if (!slave) {
+	public void storeRecord(Record record) throws ServiceSecurityException,
+			TException {
+		if (slave || writeaccess) {
+			archive.store(record, Record.class);
+		} else {
 			throw new ServiceSecurityException(
 					"Curator does not support storeRecord");
 		}
-		archive.store(record, Record.class);
+
 	}
 
 	/**
@@ -496,7 +519,8 @@ public class CuratorHandler implements Curator.Iface {
 	 * @throws TException
 	 * @throws AnnotationFailedException
 	 */
-	public void performAnnotation(Record record, String view_name, boolean forceUpdate) throws ServiceUnavailableException,
+	public void performAnnotation(Record record, String view_name,
+			boolean forceUpdate) throws ServiceUnavailableException,
 			AnnotationFailedException, TException {
 
 		long startTime = System.currentTimeMillis();
@@ -504,11 +528,14 @@ public class CuratorHandler implements Curator.Iface {
 		if (!slave) {
 			logger.debug("Finding annotator for {}", view_name);
 			Pool pool = pools.get(view_name);
-			
-			//we need to check we can provide this annotation
+
+			// we need to check we can provide this annotation
 			if (!pools.containsKey(view_name)) {
 				logger.debug("Couldn't find an annotator for {}", view_name);
-				throw new ServiceUnavailableException("The Curator does not know of any annotators for " +view_name+ ". Check the annotators.xml config file or call describeAnnotations().");
+				throw new ServiceUnavailableException(
+						"The Curator does not know of any annotators for "
+								+ view_name
+								+ ". Check the annotators.xml config file or call describeAnnotations().");
 			}
 			Object client = null;
 			try {
@@ -524,13 +551,13 @@ public class CuratorHandler implements Curator.Iface {
 					pool.releaseClient(client);
 				// propagate error to calling client
 				if (e.getCause() != null) {
-					logger.warn("{} : {}", view_name, e.getCause()
-							.toString());
-					throw new ServiceUnavailableException(view_name +" unavailable:"+ 
-							e.getCause().toString());
+					logger.warn("{} : {}", view_name, e.getCause().toString());
+					throw new ServiceUnavailableException(view_name
+							+ " unavailable:" + e.getCause().toString());
 				} else {
 					logger.warn("{} : {}", view_name, e.toString());
-					throw new ServiceUnavailableException(view_name +" unavailable:"+ e.toString());
+					throw new ServiceUnavailableException(view_name
+							+ " unavailable:" + e.toString());
 				}
 			} catch (Exception e) {
 				if (client != null)
@@ -539,8 +566,7 @@ public class CuratorHandler implements Curator.Iface {
 			}
 			// else if slave
 		} else {
-			logger
-					.debug("Calling master Curator for {}", view_name);
+			logger.debug("Calling master Curator for {}", view_name);
 			Pair<TTransport, Object> tc = createClient(masterHost, masterPort,
 					Curator.Client.class);
 			TTransport transport = tc.first;
@@ -569,14 +595,14 @@ public class CuratorHandler implements Curator.Iface {
 		long endTime = System.currentTimeMillis();
 		// update count and time for status reports
 		counters.get(view_name).incrementAndGet();
-		timers.get(view_name)
-				.addAndGet((int) (endTime - startTime));
+		timers.get(view_name).addAndGet((int) (endTime - startTime));
 		// finally store record
 		archive.store(record, Record.class);
 	}
 
 	/**
 	 * Calls the master curator and adds the requested field.
+	 * 
 	 * @param record
 	 * @param view_name
 	 * @param forceUpdate
@@ -586,22 +612,30 @@ public class CuratorHandler implements Curator.Iface {
 	 * @throws TException
 	 */
 	private void transformMaster(Record record, String view_name,
-			boolean forceUpdate, Object client) throws ServiceUnavailableException, AnnotationFailedException, TException {
+			boolean forceUpdate, Object client)
+			throws ServiceUnavailableException, AnnotationFailedException,
+			TException {
 		Curator.Client c = (Curator.Client) client;
-		Record masterRecord = c.provide(view_name, record.getRawText(), forceUpdate);
+		Record masterRecord = c.provide(view_name, record.getRawText(),
+				forceUpdate);
 		if (masterRecord.getLabelViews().containsKey(view_name)) {
-			record.getLabelViews().put(view_name, masterRecord.getLabelViews().get(view_name));
+			record.getLabelViews().put(view_name,
+					masterRecord.getLabelViews().get(view_name));
 		} else if (masterRecord.getClusterViews().containsKey(view_name)) {
-			record.getClusterViews().put(view_name, masterRecord.getClusterViews().get(view_name));
+			record.getClusterViews().put(view_name,
+					masterRecord.getClusterViews().get(view_name));
 		} else if (masterRecord.getParseViews().containsKey(view_name)) {
-			record.getParseViews().put(view_name, masterRecord.getParseViews().get(view_name));
+			record.getParseViews().put(view_name,
+					masterRecord.getParseViews().get(view_name));
 		} else if (masterRecord.getViews().containsKey(view_name)) {
-			record.getViews().put(view_name, masterRecord.getViews().get(view_name));
+			record.getViews().put(view_name,
+					masterRecord.getViews().get(view_name));
 		}
 	}
 
 	/**
 	 * Is an annotation out of date with respect to the current service?
+	 * 
 	 * @param view_name
 	 * @param record
 	 * @return
@@ -609,24 +643,26 @@ public class CuratorHandler implements Curator.Iface {
 	private boolean updateRequired(String view_name, Record record) {
 		String clientSource = clientSourceIdentifiers.get(view_name);
 		String annotationSource = null;
-		
-		//special case for whitespace tokenizer!
+
+		// special case for whitespace tokenizer!
 		if (view_name.equals("tokens") && record.isWhitespaced()) {
-			if(!record.getLabelViews().get("tokens").getSource().equals(Whitespacer.getSourceIdentifier())) {
+			if (!record.getLabelViews().get("tokens").getSource()
+					.equals(Whitespacer.getSourceIdentifier())) {
 				return true;
 			} else {
 				return false;
 			}
 		}
 		if (view_name.equals("sentences") && record.isWhitespaced()) {
-			if(!record.getLabelViews().get("sentences").getSource().equals(Whitespacer.getSourceIdentifier())) {
+			if (!record.getLabelViews().get("sentences").getSource()
+					.equals(Whitespacer.getSourceIdentifier())) {
 				return true;
 			} else {
 				return false;
 			}
 		}
-		//end special case for whitespace tokenizer
-		
+		// end special case for whitespace tokenizer
+
 		if (record.getLabelViews().containsKey(view_name)) {
 			Labeling labeling = record.getLabelViews().get(view_name);
 			annotationSource = labeling.getSource();
@@ -654,43 +690,49 @@ public class CuratorHandler implements Curator.Iface {
 		if (annotationSource.equals(clientSource)) {
 			return false;
 		}
-	
+
 		int osplit = annotationSource.lastIndexOf("-");
 		int csplit = clientSource.lastIndexOf("-");
 		if (osplit == -1)
 			return true;
-	
+
 		if (!annotationSource.substring(0, osplit).equals(
 				clientSource.substring(0, csplit)))
 			return true;
-	
+
 		double oversion = 0.0;
 		double cversion = 0.0;
-	
+
 		try {
 			oversion = Double.valueOf(annotationSource.substring(osplit + 1));
 		} catch (NumberFormatException e) {
 			return true;
 		}
-	
+
 		try {
 			cversion = Double.valueOf(clientSource.substring(csplit + 1));
 		} catch (NumberFormatException e) {
 			logger.warn("Unable to parse version number in {}", clientSource);
 		}
-	
+
 		return cversion > oversion;
 	}
 
 	/**
-	 * Calls the underlying annotation server and populates the appropriate views
-	 * @param record Record to populate
-	 * @param view_name view name for the annotation
-	 * @param client client to the annotation server
+	 * Calls the underlying annotation server and populates the appropriate
+	 * views
+	 * 
+	 * @param record
+	 *            Record to populate
+	 * @param view_name
+	 *            view name for the annotation
+	 * @param client
+	 *            client to the annotation server
 	 * @throws AnnotationFailedException
 	 * @throws TException
 	 */
-	private void transform(Record record, String view_name, Object client) throws AnnotationFailedException, TException {
+	private void transform(Record record, String view_name, Object client)
+			throws AnnotationFailedException, TException {
 		if (client instanceof Labeler.Iface) {
 			// Handle Labelers
 			Labeler.Iface c = (Labeler.Iface) client;
@@ -704,7 +746,9 @@ public class CuratorHandler implements Curator.Iface {
 			Map<String, Labeling> labelViews = record.getLabelViews();
 			for (int i = 0; i < labelings.size(); i++) {
 				if (i >= fields.size()) {
-					logger.error("Too many labelings returned by {} annotator; maybe not enough fields specified in annotators.xml?", view_name);
+					logger.error(
+							"Too many labelings returned by {} annotator; maybe not enough fields specified in annotators.xml?",
+							view_name);
 					break;
 				}
 				labelViews.put(fields.get(i), labelings.get(i));
@@ -727,14 +771,16 @@ public class CuratorHandler implements Curator.Iface {
 			Map<String, Forest> parseViews = record.getParseViews();
 			for (int i = 0; i < forests.size(); i++) {
 				if (i >= fields.size()) {
-					logger.error("Too many forests returned by {} annotator; maybe not enough fields specified in annotators.xml?", view_name);
+					logger.error(
+							"Too many forests returned by {} annotator; maybe not enough fields specified in annotators.xml?",
+							view_name);
 					break;
 				}
 				parseViews.put(fields.get(i), forests.get(i));
 			}
 		} else {
 			logger.error("Unknown client type!");
-		}	
+		}
 	}
 
 	public MultiRecord getMultiRecord(List<String> texts)
@@ -756,7 +802,6 @@ public class CuratorHandler implements Curator.Iface {
 		return multiRec;
 	}
 
-
 	/**
 	 * Get the status report.
 	 * 
@@ -765,8 +810,8 @@ public class CuratorHandler implements Curator.Iface {
 	private String getStatusReport() {
 		StringBuffer result = new StringBuffer();
 		for (String name : counters.keySet()) {
-			result.append(getStatusItem(name, counters.get(name), timers
-					.get(name)));
+			result.append(getStatusItem(name, counters.get(name),
+					timers.get(name)));
 			result.append(" | ");
 		}
 		return result.toString();
@@ -781,21 +826,21 @@ public class CuratorHandler implements Curator.Iface {
 	}
 
 	public void storeMultiRecord(MultiRecord record)
-			throws ServiceSecurityException,
-			TException {
-		if (!slave) {
+			throws ServiceSecurityException, TException {
+		if (slave || writeaccess) {
+			archive.store(record, MultiRecord.class);
+		} else {
 			throw new ServiceSecurityException(
 					"Curator does not support storeMultiRecord");
 		}
-		archive.store(record, MultiRecord.class);	
+
 	}
 
-
-	public Record provide(String view_name, String text, 
-			boolean forceUpdate) throws ServiceUnavailableException,
-			AnnotationFailedException, TException {
+	public Record provide(String view_name, String text, boolean forceUpdate)
+			throws ServiceUnavailableException, AnnotationFailedException,
+			TException {
 		Record record = getRecord(text);
-		//check requirements
+		// check requirements
 		for (String requirement : requirements.get(view_name)) {
 			forceUpdate = forceUpdate || updateRequired(requirement, record);
 			if (forceUpdate) {
@@ -809,15 +854,13 @@ public class CuratorHandler implements Curator.Iface {
 		return record;
 	}
 
-
-
 	public Record wsgetRecord(List<String> sentences)
 			throws ServiceUnavailableException, AnnotationFailedException,
 			TException {
 		String rawText = StringUtil.join(sentences, " ");
 		Record record = getRecord(rawText, true);
 		// if record has no sentences annotation
-		//    or the sentence annotation is stale update!
+		// or the sentence annotation is stale update!
 		if (!record.getLabelViews().containsKey("sentences")
 				|| !record.getLabelViews().get("sentences").getSource()
 						.equals(Whitespacer.getSourceIdentifier())) {
@@ -832,21 +875,17 @@ public class CuratorHandler implements Curator.Iface {
 		}
 		return record;
 	}
-	
-
-
 
 	public Map<String, String> describeAnnotations() throws TException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-
 	public Record wsprovide(String view_name, List<String> sentences,
 			boolean forceUpdate) throws ServiceUnavailableException,
 			AnnotationFailedException, TException {
 		Record record = wsgetRecord(sentences);
-		//check requirements
+		// check requirements
 		for (String requirement : requirements.get(view_name)) {
 			forceUpdate = forceUpdate || updateRequired(requirement, record);
 			if (forceUpdate) {
@@ -855,13 +894,13 @@ public class CuratorHandler implements Curator.Iface {
 		}
 		forceUpdate = forceUpdate || updateRequired(view_name, record);
 		if (forceUpdate) {
-			//special case for whitespace tokenizer!
+			// special case for whitespace tokenizer!
 			if (view_name.equals("sentences") || view_name.equals("tokens")) {
 				Labeling sents = Whitespacer.sentences(sentences);
 				record.getLabelViews().put("sentences", sents);
 				Labeling tokens = Whitespacer.tokenize(sentences);
 				record.getLabelViews().put("tokens", tokens);
-			//end special case
+				// end special case
 			} else {
 				performAnnotation(record, view_name, forceUpdate);
 			}
