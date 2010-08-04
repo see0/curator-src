@@ -42,7 +42,7 @@ public class CuratorServer {
 				.create("config");
 		Option annotators = OptionBuilder.withArgName("annotators").hasArg()
 				.withDescription("annotators configuration file (annotators.xml)")
-				.create("config");
+				.create("annotators");
 		Option help = new Option("help", "print this message");
 		Options options = new Options();
 		options.addOption(port);

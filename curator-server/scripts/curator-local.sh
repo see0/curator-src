@@ -10,5 +10,5 @@ CLASSPATH=${CURATOR_BASE}/curator-server/bin:$CURATOR_BASE/curator-server/config
 
 
 cd $CURATOR_BASE/curator-server
-java -cp $CLASSPATH -Dhome=$CURATOR_BASE/curator-server -Xmx 4000m edu.illinois.cs.cogcomp.curator.CuratorServer -config configs/curator.properties -annotators configs/annotators-local.xml -port 9090
+java -cp $CLASSPATH -Dhome=$CURATOR_BASE/curator-server -Xmx4000m edu.illinois.cs.cogcomp.curator.CuratorServer -config configs/curator.properties -annotators configs/annotators-local.xml -port 9090
 cd $PWD
