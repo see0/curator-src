@@ -57,7 +57,7 @@
 	</target>
 
     <target name="test" description="run the unit tests" depends="compile-test">
-      <junit fork="yes" printsummary="yes" maxmemory="256m" failureproperty="tests.failed">
+      <junit fork="yes" printsummary="yes" maxmemory="${memory}" failureproperty="tests.failed">
         <test name="${class.test}"/>        
         <formatter type="plain" usefile="true" />
         <classpath refid="test.classpath"/>
