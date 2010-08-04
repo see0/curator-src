@@ -52,7 +52,7 @@ public class KBestStanfordParserHandler implements KBestParser.Iface {
 			config.load(new BufferedInputStream(in));
 			in.close();
 		} catch (IOException e) {
-			logger.warn("Error reading configuration file. {}", e);
+			logger.warn("Error reading configuration file. {}", configFilename);
 		}
 
 		String data = config.getProperty("stanford.data",
