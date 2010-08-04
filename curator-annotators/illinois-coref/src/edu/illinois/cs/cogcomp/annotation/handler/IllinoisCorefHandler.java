@@ -64,7 +64,7 @@ public class IllinoisCorefHandler implements ClusterGenerator.Iface {
 			config.load(new BufferedInputStream(in));
 			in.close();
 		} catch (IOException e) {
-			logger.warn("Error reading configuration file. {}", e);
+			logger.warn("Error reading configuration file. {}", configFilename);
 		}
 		tokensfield = config.getProperty("tokens.field", "tokens");
 		sentencesfield = config.getProperty("sentences.field", "sentences");
