@@ -8,7 +8,7 @@
 	<property name="build.test" location="${build}/test" />
     <property name="class.main" value="edu.illinois.cs.cogcomp.annotation.server.IllinoisChunkerServer"/>
     <property name="class.test" value="edu.illinois.cs.cogcomp.annotation.handler.IllinoisChunkerHandlerTest"/>
-    <property name="memory" value="256m" />
+    <property name="memory" value="512m" />
   
 	<target name="resolve" description="retrieve dependencies with ivy" depends="init-ivy">
       <ivy:resolve file="ivy.xml" />
@@ -59,7 +59,7 @@
 	</target>
 
     <target name="test" description="run the unit tests" depends="compile-test">
-      <junit fork="yes" printsummary="yes" maxmemory="256m" failureproperty="tests.failed">
+      <junit fork="yes" printsummary="yes" maxmemory="${memory}" failureproperty="tests.failed">
         <test name="${class.test}"/>        
         <formatter type="plain" usefile="true" />
         <classpath refid="test.classpath"/>
