@@ -125,7 +125,7 @@ public class IllinoisNERHandler implements Labeler.Iface {
 
 		long endTime = System.currentTimeMillis();
 		long time = endTime - startTime;
-		logger.info("Performed NER in {}ms", time);
+		logger.debug("Performed NER in {}ms", time);
 		return data;
 	}
 

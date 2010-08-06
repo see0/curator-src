@@ -39,11 +39,3 @@ service MultiParser extends base.BaseService {
    **/
   list<base.Forest> parseRecord(1:curator.Record record) throws (1:base.AnnotationFailedException ex),
 }
-
-
-service KBestParser extends base.BaseService {
-  /**
-   * Parses the Record and returns a list of k Forests for this record.
-   **/
-   list<base.Forest> parseRecord(1:curator.Record record, 2:i32 k) throws (1:base.AnnotationFailedException ex),
-}

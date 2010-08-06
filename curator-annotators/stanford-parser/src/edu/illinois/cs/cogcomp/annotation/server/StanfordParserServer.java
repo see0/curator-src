@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import edu.illinois.cs.cogcomp.annotation.handler.KBestStanfordParserHandler;
 import edu.illinois.cs.cogcomp.annotation.handler.StanfordParserHandler;
-import edu.illinois.cs.cogcomp.thrift.parser.KBestParser;
 import edu.illinois.cs.cogcomp.thrift.parser.MultiParser;
 
 public class StanfordParserServer {
@@ -94,18 +93,14 @@ public class StanfordParserServer {
 		if (line.hasOption("kbest")) {
 			kbest = true;
 		}
-
+		MultiParser.Iface handler;
 		if (kbest) {
-			KBestParser.Iface handler = new KBestStanfordParserHandler(
-					configFile);
-			KBestParser.Processor processor = new KBestParser.Processor(handler);
-			runServer(processor, port, threads);
+			handler = new KBestStanfordParserHandler(configFile);
 		} else {
-			MultiParser.Iface handler = new StanfordParserHandler(configFile);
-			MultiParser.Processor processor = new MultiParser.Processor(handler);
-			runServer(processor, port, threads);
+			handler = new StanfordParserHandler(configFile);
 		}
-
+		MultiParser.Processor processor = new MultiParser.Processor(handler);
+		runServer(processor, port, threads);
 	}
 
 	public static void runServer(TProcessor processor, int port, int threads) {

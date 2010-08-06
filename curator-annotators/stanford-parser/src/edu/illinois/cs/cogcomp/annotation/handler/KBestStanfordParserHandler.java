@@ -19,7 +19,7 @@ import edu.illinois.cs.cogcomp.thrift.base.Node;
 import edu.illinois.cs.cogcomp.thrift.base.Span;
 import edu.illinois.cs.cogcomp.thrift.base.Tree;
 import edu.illinois.cs.cogcomp.thrift.curator.Record;
-import edu.illinois.cs.cogcomp.thrift.parser.KBestParser;
+import edu.illinois.cs.cogcomp.thrift.parser.MultiParser;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
@@ -28,14 +28,15 @@ import edu.stanford.nlp.trees.LabeledScoredTreeFactory;
 import edu.stanford.nlp.trees.TreeFactory;
 import edu.stanford.nlp.util.ScoredObject;
 
-public class KBestStanfordParserHandler implements KBestParser.Iface {
+public class KBestStanfordParserHandler implements MultiParser.Iface {
 	private final Logger logger = LoggerFactory
 			.getLogger(KBestStanfordParserHandler.class);
 	private final LexicalizedParser parser;
-	private static final String VERSION = "0.1";
+	private static final String VERSION = "0.2";
 	private String sentencesfield = "sentences";
 	private String tokensfield = "tokens";
 	private boolean useTokens = true;
+	private int k = 50; //number of trees to return
 
 	public KBestStanfordParserHandler() {
 		this("configs/stanford.properties");
@@ -66,6 +67,15 @@ public class KBestStanfordParserHandler implements KBestParser.Iface {
 		} else {
 			useTokens = true;
 		}
+		
+		String kstr = config.getProperty("stanford.k", "50");
+		try {
+			k = Integer.parseInt(kstr);
+		} catch (NumberFormatException e) {
+			logger.warn("Couldn't recognize {} as an integer. Defaulting to 50.", kstr);
+			k = 50;
+		}
+		
 		parser = new LexicalizedParser(data);
 		parser.setOptionFlags(new String[] { "-retainTmpSubcategories" });
 	}
@@ -99,18 +109,13 @@ public class KBestStanfordParserHandler implements KBestParser.Iface {
 		return node;
 	}
 
-	public List<Forest> parseRecord(Record record, int k)
+	public List<Forest> parseRecord(Record record)
 			throws AnnotationFailedException, TException {
 		String rawText = record.getRawText();
-		// the semantics here is going to be different from other parsers
-		// each forest will contain the k best trees for a sentence
-		// rather than each forest containing the kth best tree for the
-		// sentences
 		List<Forest> forests = new ArrayList<Forest>();
 		for (Span sentence : record.getLabelViews().get(sentencesfield)
 				.getLabels()) {
-			Forest parseForest = new Forest();
-			parseForest.setSource(getSourceIdentifier());
+
 			// int offset = sentence.getStart();
 			int offset = 0;
 			Object input = null;
@@ -133,6 +138,7 @@ public class KBestStanfordParserHandler implements KBestParser.Iface {
 			}
 			List<ScoredObject<edu.stanford.nlp.trees.Tree>> kParses = parseK(
 					input, k);
+			int kcounter = 0;
 			for (ScoredObject<edu.stanford.nlp.trees.Tree> so : kParses) {
 				if (so.object().numChildren() > 1) {
 					logger.warn("More than one child in the top Tree.\n{}",
@@ -144,12 +150,15 @@ public class KBestStanfordParserHandler implements KBestParser.Iface {
 				Node top = generateNode(pt, tree, offset);
 				tree.getNodes().add(top);
 				tree.setTop(tree.getNodes().size() - 1);
-				if (!parseForest.isSetTrees()) {
-					parseForest.setTrees(new ArrayList<Tree>());
+				if (forests.size() < kcounter+1) {
+					Forest forest = new Forest();
+					forest.setSource(getSourceIdentifier());
+					forest.setTrees(new ArrayList<Tree>());
+					forests.add(forest);
 				}
-				parseForest.getTrees().add(tree);
+				forests.get(kcounter).getTrees().add(tree);
+				kcounter++;
 			}
-			forests.add(parseForest);
 		}
 		return forests;
 	}
@@ -166,7 +175,7 @@ public class KBestStanfordParserHandler implements KBestParser.Iface {
 		}
 		if (parsed) {
 			long endTime = System.currentTimeMillis();
-			logger.info("Parsed input in {}ms", endTime - startTime);
+			logger.debug("Parsed input in {}ms", endTime - startTime);
 			return parser.getKBestPCFGParses(k);
 		}
 		// if can't parse or exception, fall through
@@ -193,16 +202,16 @@ public class KBestStanfordParserHandler implements KBestParser.Iface {
 		result.add(new ScoredObject<edu.stanford.nlp.trees.Tree>(lstf
 				.newTreeNode("X", lst2), 0.0));
 		long endTime = System.currentTimeMillis();
-		logger.info("Parsed input in {}ms", endTime - startTime);
+		logger.debug("Parsed input in {}ms", endTime - startTime);
 		return result;
 	}
 
 	public String getName() throws TException {
-		return "Stanford K-Best Parser";
+		return "Stanford K-Best Parser (k="+k+")";
 	}
 
 	public String getSourceIdentifier() throws TException {
-		return "stanford-kbest-" + getVersion();
+		return "stanford-"+k+"best-" + getVersion();
 	}
 
 	public String getVersion() throws TException {

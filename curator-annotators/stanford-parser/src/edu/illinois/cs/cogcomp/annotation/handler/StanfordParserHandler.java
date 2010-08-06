@@ -54,10 +54,13 @@ public class StanfordParserHandler implements MultiParser.Iface {
 	private boolean useTokens = true;
 	
 	public StanfordParserHandler() {
-		this("configs/stanford.properties");
+		this("");
 	}
 	
 	public StanfordParserHandler(String configFilename) {
+		if (configFilename.trim().equals("")) {
+			configFilename =  "configs/stanford.properties";
+		}
 		Properties config = new Properties();
 		
 		try {
@@ -153,7 +156,7 @@ public class StanfordParserHandler implements MultiParser.Iface {
 		edu.stanford.nlp.trees.Tree result = (edu.stanford.nlp.trees.Tree) parser
 				.apply(text);
 		long endTime = System.currentTimeMillis();
-		logger.info("Parsed input in {}ms", endTime - startTime);
+		logger.debug("Parsed input in {}ms", endTime - startTime);
 		return result;
 	}
 

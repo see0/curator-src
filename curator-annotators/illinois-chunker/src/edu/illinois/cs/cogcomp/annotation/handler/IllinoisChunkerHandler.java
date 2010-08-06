@@ -109,7 +109,7 @@ public class IllinoisChunkerHandler implements Labeler.Iface {
     	labeling.setSource(getSourceIdentifier());
 
 		long endTime = System.currentTimeMillis();
-		logger.info("Tagged input in {}ms", endTime-startTime);
+		logger.debug("Tagged input in {}ms", endTime-startTime);
 		return labeling;
 	}
 

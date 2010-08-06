@@ -1,0 +1,68 @@
+<project name="curator-packages" default="deploy" basedir=".">
+
+<property name="deploy.dir" location="deploy" />  
+<property name="deploy.bin" location="${deploy.dir}/bin" />  
+<property name="deploy.components" location="${deploy.dir}/components" />  
+<property name="deploy.configs" location="${deploy.dir}/configs" />  
+<property name="deploy.data" location="${deploy.dir}/data" />  
+
+
+<macrodef name="annotator-deploy">
+   <attribute name="annotator" default="NOT SET"/>
+   <sequential>
+     <ant antfile="build.xml" dir="curator-annotators/@{annotator}" target="dist" />
+     <copy file="curator-annotators/@{annotator}/dist/@{annotator}-server.jar" todir="${deploy.components}" overwrite="true" />
+     <copy file="curator-annotators/@{annotator}/@{annotator}-server.sh" todir="${deploy.bin}" overwrite="true" />
+     <copy todir="${deploy.configs}">
+       <fileset dir="curator-annotators/@{annotator}/configs" erroronmissingdir="false">
+         <include name="*"/>
+       </fileset>
+     </copy>
+   </sequential>
+</macrodef>
+
+<target name="clean">
+  <delete dir="${deploy.dir}" />
+</target>
+
+<target name="deploy">
+  <mkdir dir="${deploy.dir}" />
+  <mkdir dir="${deploy.bin}" />
+  <mkdir dir="${deploy.components}" />
+  <mkdir dir="${deploy.configs}" />
+  <mkdir dir="${deploy.data}" />
+  
+  <ant antfile="build.xml" dir="curator-interfaces" target="dist" />
+  <copy file="curator-interfaces/dist/curator-interfaces.jar" todir="${deploy.components}" overwrite="true" />
+  <copy todir="${deploy.components}">
+    <fileset dir="curator-interfaces">
+      <include name="gen-*/**"/>
+      <exclude name="gen-java/**"/>
+    </fileset>
+  </copy>
+  
+  <ant antfile="build.xml" dir="curator-server" target="dist" />
+  <copy file="curator-server/dist/curator-server.jar" todir="${deploy.components}" overwrite="true" />
+  <copy todir="${deploy.configs}">
+    <fileset dir="curator-server/configs">
+      <include name="*"/>
+    </fileset>
+  </copy>
+  
+  <annotator-deploy annotator="illinois-tokenizer" />
+  <annotator-deploy annotator="illinois-pos" />
+  <annotator-deploy annotator="illinois-chunker" />
+  <annotator-deploy annotator="illinois-ner" />
+  <annotator-deploy annotator="illinois-coref" />
+  <annotator-deploy annotator="stanford-parser" />
+
+  <copy file="build.deployed.xml" tofile="${deploy.dir}/build.xml" overwrite="true" />
+  <copy file="ivy.deployed.xml" tofile="${deploy.dir}/ivy.xml" overwrite="true" />
+  <copy file="logback.xml" tofile="${deploy.dir}/logback.xml" overwrite="true" />
+  
+  <copy todir="${deploy.bin}">
+    <fileset dir="curator-server/scripts" />
+  </copy>
+  </target>
+
+</project>
