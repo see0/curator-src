@@ -5,6 +5,8 @@
 <property name="deploy.components" location="${deploy.dir}/components" />  
 <property name="deploy.configs" location="${deploy.dir}/configs" />  
 <property name="deploy.data" location="${deploy.dir}/data" />  
+<property name="deploy.lib" location="${deploy.dir}/lib" />  
+
 
 
 <macrodef name="annotator-deploy">
@@ -60,6 +62,8 @@
   <copy file="ivy.deployed.xml" tofile="${deploy.dir}/ivy.xml" overwrite="true" />
   <copy file="logback.xml" tofile="${deploy.dir}/logback.xml" overwrite="true" />
   
+  <copy file="lib/libthrift.jar" todir="${deploy.lib}" overwrite="true" />
+
   <copy todir="${deploy.bin}">
     <fileset dir="curator-server/scripts" />
   </copy>
