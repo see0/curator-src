@@ -139,8 +139,7 @@ public class CuratorHandler implements Curator.Iface {
 				if (!local.equals("")) {
 					BaseService.Iface service = initClassInstance(local);
 					pool = new MockPool(service);
-				}
-				if (type.equals("labeler")) {
+				} else if (type.equals("labeler")) {
 					cpool.addClients(hosts, CLIENTCOUNT, Labeler.Client.class);
 					pool = cpool;
 				} else if (type.equals("multilabeler")) {
@@ -405,7 +404,6 @@ public class CuratorHandler implements Curator.Iface {
 		}
 		logger.debug("Asking archive for record");
 		Record record = archive.get(text, whitespaced, Record.class);
-		logger.debug("Record provided by archive");
 		if (record == null) {
 			if (slave) {
 				Pair<TTransport, Object> tc = createClient(masterHost,
@@ -439,6 +437,8 @@ public class CuratorHandler implements Curator.Iface {
 				record.setParseViews(new HashMap<String, Forest>());
 				record.setViews(new HashMap<String, View>());
 				record.setIdentifier(Identifier.getId(text, whitespaced));
+			} else {
+				logger.debug("Record provided by archive");
 			}
 		}
 		removeStaleFields(record);
@@ -946,4 +946,9 @@ public class CuratorHandler implements Curator.Iface {
 		return getRecord(text, false);
 	}
 
+	
+	public static void main(String args[]) {
+		String text = "This is an example sentence.";
+		Curator.Iface handler = new CuratorHandler("configs/curator.properties", "configs/annotators-simple.xml");
+	}
 }
