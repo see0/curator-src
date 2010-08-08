@@ -853,10 +853,12 @@ public class CuratorHandler implements Curator.Iface {
 			TException {
 		Record record = getRecord(text);
 		// check requirements
-		for (String requirement : requirements.get(view_name)) {
-			forceUpdate = forceUpdate || updateRequired(requirement, record);
-			if (forceUpdate) {
-				record = provide(requirement, record.getRawText(), forceUpdate);
+		if (requirements.containsKey(view_name)) {
+			for (String requirement : requirements.get(view_name)) {
+				forceUpdate = forceUpdate || updateRequired(requirement, record);
+				if (forceUpdate) {
+					record = provide(requirement, record.getRawText(), forceUpdate);
+				}
 			}
 		}
 		forceUpdate = forceUpdate || updateRequired(view_name, record);
@@ -912,10 +914,12 @@ public class CuratorHandler implements Curator.Iface {
 			AnnotationFailedException, TException {
 		Record record = wsgetRecord(sentences);
 		// check requirements
-		for (String requirement : requirements.get(view_name)) {
-			forceUpdate = forceUpdate || updateRequired(requirement, record);
-			if (forceUpdate) {
-				record = wsprovide(requirement, sentences, forceUpdate);
+		if (requirements.containsKey(view_name)) {
+			for (String requirement : requirements.get(view_name)) {
+				forceUpdate = forceUpdate || updateRequired(requirement, record);
+				if (forceUpdate) {
+					record = wsprovide(requirement, sentences, forceUpdate);
+				}
 			}
 		}
 		forceUpdate = forceUpdate || updateRequired(view_name, record);
