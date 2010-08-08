@@ -39,7 +39,7 @@
       <echo>java -Xmx${memory} -classpath ${thecp} ${class.main}</echo>
     </target>
 
-	<target name="dist" description="creates a jar of the project in dist/">
+	<target name="dist" description="creates a jar of the project in dist/" depends="compile">
 		<mkdir dir="${dist}" />
 		<jar destfile="${dist}/curator-server.jar">
 			<fileset dir="${build}" />
