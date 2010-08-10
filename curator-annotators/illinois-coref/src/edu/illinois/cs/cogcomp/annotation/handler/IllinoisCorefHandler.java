@@ -156,7 +156,7 @@ public class IllinoisCorefHandler implements ClusterGenerator.Iface {
 	}
 
 	public String getSourceIdentifier() throws TException {
-		return "illinois-coref-" + getVersion();
+		return "illinoiscoref-" + getVersion();
 	}
 
 	public Clustering clusterRecords(List<Record> records)

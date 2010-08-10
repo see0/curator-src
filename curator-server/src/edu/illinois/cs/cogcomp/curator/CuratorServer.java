@@ -33,17 +33,24 @@ public class CuratorServer {
 	 * and main to get a server working!
 	 */
 	public static Options createOptions() {
-		Option port = OptionBuilder.withArgName("port").hasArg()
-				.withDescription("port to open server on").create("port");
-		Option threads = OptionBuilder.withArgName("threads").hasArg()
-				.withDescription("number of threads to run").create("threads");
-		Option config = OptionBuilder.withArgName("config").hasArg()
+		Option port = OptionBuilder.withLongOpt("port").withArgName("PORT")
+				.hasArg().withDescription("port to open server on").create("p");
+		Option threads = OptionBuilder.withLongOpt("threads")
+				.withArgName("THREADS").hasArg()
+				.withDescription("number of threads to run").create("t");
+		Option config = OptionBuilder.withLongOpt("config")
+				.withArgName("CONFIG").hasArg()
 				.withDescription("configuration file (curator.properties)")
-				.create("config");
-		Option annotators = OptionBuilder.withArgName("annotators").hasArg()
-				.withDescription("annotators configuration file (annotators.xml)")
-				.create("annotators");
-		Option help = new Option("help", "print this message");
+				.create("c");
+		Option annotators = OptionBuilder
+				.withLongOpt("annotators")
+				.withArgName("ANNOTATORS")
+				.hasArg()
+				.withDescription(
+						"annotators configuration file (annotators.xml)")
+				.create("a");
+		Option help = new Option("h", "help", false, "print this message");
+
 		Options options = new Options();
 		options.addOption(port);
 		options.addOption(threads);

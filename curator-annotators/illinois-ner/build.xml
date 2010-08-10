@@ -19,7 +19,7 @@
 	<path id="project.classpath">
 		<pathelement location="${curator-lib}/curator-interfaces.jar" />
         <pathelement location="${curator-lib}/libthrift.jar" />
-        <pathelement location="lib/LBJ2Library.jar" />
+        <pathelement location="lib/LBJ2Library-2.2.2.jar" />
         <pathelement location="lib/LbjNerTagger.jar" />
         <path refid="dependencies.classpath" />
         <pathelement location="${build}" />

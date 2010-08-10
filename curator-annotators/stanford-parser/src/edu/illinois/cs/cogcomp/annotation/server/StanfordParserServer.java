@@ -35,14 +35,17 @@ public class StanfordParserServer {
 	 * and main to get a server working!
 	 */
 	public static Options createOptions() {
-		Option port = OptionBuilder.withArgName("port").hasArg()
-				.withDescription("port to open server on").create("port");
-		Option threads = OptionBuilder.withArgName("threads").hasArg()
-				.withDescription("number of threads to run").create("threads");
-		Option config = OptionBuilder.withArgName("config").hasArg()
-				.withDescription("configuration file").create("config");
-		Option kbest = new Option("kbest", "run a kbest server");
-		Option help = new Option("help", "print this message");
+		Option port = OptionBuilder.withLongOpt("port").withArgName("PORT")
+				.hasArg().withDescription("port to open server on").create("p");
+		Option threads = OptionBuilder.withLongOpt("threads")
+				.withArgName("THREADS").hasArg()
+				.withDescription("number of threads to run").create("t");
+		Option config = OptionBuilder.withLongOpt("config")
+				.withArgName("CONFIG").hasArg()
+				.withDescription("configuration file").create("c");
+		
+		Option kbest = new Option("k", "kbest", false, "run a kbest server");
+		Option help = new Option("h", "help", false, "print this message");
 		Options options = new Options();
 		options.addOption(port);
 		options.addOption(threads);

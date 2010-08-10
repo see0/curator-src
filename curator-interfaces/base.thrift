@@ -32,8 +32,8 @@ struct Span {
   4: optional double score,
   /** source of span. */
   5: optional Source source,
-  /** an additional attribute assoicated with this span. */
-  6: optional string attribute,
+  /** an additional attributes assoicated with this span. */
+  6: optional map<string, string> attributes,
   /** index of the text (in the multirecord) to which this span references. */
   7: optional i32 multiIndex,
 }

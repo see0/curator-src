@@ -268,7 +268,8 @@ public class StanfordParserHandler implements MultiParser.Iface {
 				headNode.setLabel("dependency node");
 				Span headSpan = wordToSpan(sentence.get(hpos), offset);
 				if (hcopy) {
-					headSpan.setAttribute("copy");
+					headSpan.setAttributes(new HashMap<String, String>());
+					headSpan.getAttributes().put("copy", "true");
 				}
 				headNode.setSpan(headSpan);
 				nodes.add(headNode);
@@ -290,7 +291,8 @@ public class StanfordParserHandler implements MultiParser.Iface {
 				depNode.setLabel("dependency node");
 				Span dependentSpan = wordToSpan(sentence.get(dpos), offset);
 				if (dcopy) {
-					dependentSpan.setAttribute("copy");
+					dependentSpan.setAttributes(new HashMap<String, String>());
+					dependentSpan.getAttributes().put("copy", "true");
 				}
 				depNode.setSpan(dependentSpan);
 				nodes.add(depNode);

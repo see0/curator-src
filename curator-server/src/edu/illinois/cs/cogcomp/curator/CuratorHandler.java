@@ -57,7 +57,7 @@ import edu.illinois.cs.cogcomp.util.StringUtil;
  */
 public class CuratorHandler implements Curator.Iface {
 
-	private final Logger logger = LoggerFactory.getLogger(Curator.class);
+	private final Logger logger = LoggerFactory.getLogger(CuratorHandler.class);
 
 	private final int CLIENTTIMEOUT;
 
@@ -171,9 +171,13 @@ public class CuratorHandler implements Curator.Iface {
 					pools.put(field, pool);
 					counters.put(field, new AtomicInteger());
 					timers.put(field, new AtomicInteger());
-					// store requirements
-					this.requirements.put(field,
-							Arrays.asList(requirements.split(":")));
+					if (!requirements.equals("")) {
+						// store requirements
+						this.requirements.put(field,
+								Arrays.asList(requirements.split(":")));
+						logger.debug(field + " requires "
+								+ this.requirements.get(field));
+					}
 					// store information about fields when multiple annotations
 					// are returned by
 					// annotators
@@ -193,6 +197,20 @@ public class CuratorHandler implements Curator.Iface {
 		startVersionUpdater(versionTime);
 	}
 
+	
+	private String getPoolReport() {
+		StringBuffer poolreport = new StringBuffer();
+		poolreport.append("pool status: ");
+		for (String name : pools.keySet()) {
+			poolreport.append(name);
+			poolreport.append("[");
+			poolreport.append(pools.get(name).getStatusReport());
+			poolreport.append("]");
+			poolreport.append(" ");
+		}
+		return poolreport.toString();
+	}
+	
 	/**
 	 * @param interval
 	 */
@@ -201,16 +219,7 @@ public class CuratorHandler implements Curator.Iface {
 			public void run() {
 				for (;;) {
 					logger.info(getStatusReport());
-					StringBuffer poolreport = new StringBuffer();
-					poolreport.append("pool status: ");
-					for (String name : pools.keySet()) {
-						poolreport.append(name);
-						poolreport.append("[");
-						poolreport.append(pools.get(name).getStatusReport());
-						poolreport.append("]");
-						poolreport.append(" ");
-					}
-					logger.info(poolreport.toString());
+					logger.info(getPoolReport());
 					try {
 						Thread.sleep(interval);
 					} catch (InterruptedException e) {
@@ -253,8 +262,7 @@ public class CuratorHandler implements Curator.Iface {
 							clientSourceIdentifiers.put(name, ident);
 						}
 						if (!clientNames.containsKey(name)
-								|| !clientNames.get(name).equals(
-										serviceName)) {
+								|| !clientNames.get(name).equals(serviceName)) {
 							clientNames.put(name, serviceName);
 						}
 
@@ -553,6 +561,8 @@ public class CuratorHandler implements Curator.Iface {
 			try {
 				client = pool.getClient();
 				transform(record, view_name, client);
+				if (client != null)
+					pool.releaseClient(client);
 			} catch (AnnotationFailedException fail) {
 				if (client != null)
 					pool.releaseClient(client);
@@ -645,6 +655,13 @@ public class CuratorHandler implements Curator.Iface {
 		}
 	}
 
+	private boolean containsView(String view_name, Record record) {
+		return record.getLabelViews().containsKey(view_name)
+				|| record.getClusterViews().containsKey(view_name)
+				|| record.getParseViews().containsKey(view_name)
+				|| record.getViews().containsKey(view_name);
+	}
+
 	/**
 	 * Is an annotation out of date with respect to the current service?
 	 * 
@@ -689,16 +706,20 @@ public class CuratorHandler implements Curator.Iface {
 			annotationSource = view.getSource();
 		}
 
-		logger.debug("service source: {} old source: {}", clientSource,
-				annotationSource);
+		if (annotationSource == null) {
+			return true;
+		}
+		
+		logger.debug(view_name
+				+ " has service source: {} current annotation source: {}",
+				clientSource, annotationSource);
+		
 		if (clientSource == null) {
 			// we don't have any information about the service so we assume it
 			// is ok!
 			return false;
 		}
-		if (annotationSource == null) {
-			return true;
-		}
+
 		if (annotationSource.equals(clientSource)) {
 			return false;
 		}
@@ -851,18 +872,23 @@ public class CuratorHandler implements Curator.Iface {
 	public Record provide(String view_name, String text, boolean forceUpdate)
 			throws ServiceUnavailableException, AnnotationFailedException,
 			TException {
+		logger.debug(getPoolReport());
+		logger.debug("Annotation requested: {}", view_name);
 		Record record = getRecord(text);
 		// check requirements
 		if (requirements.containsKey(view_name)) {
 			for (String requirement : requirements.get(view_name)) {
-				forceUpdate = forceUpdate || updateRequired(requirement, record);
+				forceUpdate = forceUpdate
+						|| !containsView(requirement, record);
 				if (forceUpdate) {
-					record = provide(requirement, record.getRawText(), forceUpdate);
+					record = provide(requirement, record.getRawText(),
+							forceUpdate);
 				}
 			}
 		}
 		forceUpdate = forceUpdate || updateRequired(view_name, record);
 		if (forceUpdate) {
+			logger.debug("Annotation {} is going to be performed.", view_name);
 			performAnnotation(record, view_name, forceUpdate);
 		}
 		return record;
@@ -871,6 +897,7 @@ public class CuratorHandler implements Curator.Iface {
 	public Record wsgetRecord(List<String> sentences)
 			throws ServiceUnavailableException, AnnotationFailedException,
 			TException {
+		logger.debug(getPoolReport());
 		String rawText = StringUtil.join(sentences, " ");
 		Record record = getRecord(rawText, true);
 		// if record has no sentences annotation
@@ -912,11 +939,13 @@ public class CuratorHandler implements Curator.Iface {
 	public Record wsprovide(String view_name, List<String> sentences,
 			boolean forceUpdate) throws ServiceUnavailableException,
 			AnnotationFailedException, TException {
+		logger.debug("Annotation requested: {}", view_name);
 		Record record = wsgetRecord(sentences);
 		// check requirements
 		if (requirements.containsKey(view_name)) {
 			for (String requirement : requirements.get(view_name)) {
-				forceUpdate = forceUpdate || updateRequired(requirement, record);
+				forceUpdate = forceUpdate
+						|| !containsView(requirement, record);
 				if (forceUpdate) {
 					record = wsprovide(requirement, sentences, forceUpdate);
 				}
@@ -932,6 +961,8 @@ public class CuratorHandler implements Curator.Iface {
 				record.getLabelViews().put("tokens", tokens);
 				// end special case
 			} else {
+				logger.debug("Annotation {} is going to be performed.",
+						view_name);
 				performAnnotation(record, view_name, forceUpdate);
 			}
 		}
@@ -950,9 +981,9 @@ public class CuratorHandler implements Curator.Iface {
 		return getRecord(text, false);
 	}
 
-	
 	public static void main(String args[]) {
 		String text = "This is an example sentence.";
-		Curator.Iface handler = new CuratorHandler("configs/curator.properties", "configs/annotators-simple.xml");
+		Curator.Iface handler = new CuratorHandler(
+				"configs/curator.properties", "configs/annotators-simple.xml");
 	}
 }

@@ -30,16 +30,21 @@ public class IllinoisTokenizerServer {
 	private static Logger logger = LoggerFactory
 			.getLogger(IllinoisTokenizerServer.class);
 
-	/* most this code is boiler plate.  All you need to modify is createOptions and main to
-	 * get a server working!
+	/*
+	 * most this code is boiler plate. All you need to modify is createOptions
+	 * and main to get a server working!
 	 */
-	
+
 	public static Options createOptions() {
-		Option port = OptionBuilder.withArgName("port").hasArg()
-				.withDescription("port to open server on").create("port");
-		Option threads = OptionBuilder.withArgName("threads").hasArg()
-		.withDescription("number of threads to run").create("threads");
-		Option help = new Option("help", "print this message");
+		Option port = OptionBuilder.withLongOpt("port").withArgName("PORT")
+				.hasArg().withDescription("port to open server on").create("p");
+		Option threads = OptionBuilder.withLongOpt("threads")
+				.withArgName("THREADS").hasArg()
+				.withDescription("number of threads to run").create("t");
+		Option config = OptionBuilder.withLongOpt("config")
+				.withArgName("CONFIG").hasArg()
+				.withDescription("configuration file").create("c");
+		Option help = new Option("h", "help", false, "print this message");
 		Options options = new Options();
 		options.addOption(port);
 		options.addOption(threads);
@@ -52,7 +57,7 @@ public class IllinoisTokenizerServer {
 		MultiLabeler.Processor processor = new MultiLabeler.Processor(tokenizer);
 		int threads = 1;
 		int port = 9090;
-		
+
 		CommandLineParser parser = new GnuParser();
 		Options options = createOptions();
 		HelpFormatter hformat = new HelpFormatter();
@@ -78,15 +83,15 @@ public class IllinoisTokenizerServer {
 		try {
 			threads = Integer.parseInt(line.getOptionValue("threads", "1"));
 		} catch (NumberFormatException e) {
-			logger.warn("Couldn't interpret {} as a number.", line
-					.getOptionValue("threads"));
+			logger.warn("Couldn't interpret {} as a number.",
+					line.getOptionValue("threads"));
 		}
 		if (threads < 0) {
 			threads = 1;
 		} else if (threads == 0) {
 			threads = 25;
 		}
-		
+
 		runServer(processor, port, threads);
 	}
 

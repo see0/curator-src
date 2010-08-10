@@ -115,7 +115,8 @@ public class SRLHandler implements Parser.Iface {
 						items[0]);
 				span.setStart(startend[0] + sentence.getStart());
 				span.setEnd(startend[1] + sentence.getStart());
-				span.setAttribute(predicate);
+				span.setAttributes(new HashMap<String, String>());
+				span.getAttributes().put("predicate", predicate);
 				location = startend[1];
 
 				Node pred = new Node();

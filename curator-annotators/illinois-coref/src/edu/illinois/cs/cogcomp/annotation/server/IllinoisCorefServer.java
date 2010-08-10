@@ -35,13 +35,15 @@ public class IllinoisCorefServer {
 	 * and main to get a server working!
 	 */
 	public static Options createOptions() {
-		Option port = OptionBuilder.withArgName("port").hasArg()
-				.withDescription("port to open server on").create("port");
-		Option threads = OptionBuilder.withArgName("threads").hasArg()
-				.withDescription("number of threads to run").create("threads");
-		Option config = OptionBuilder.withArgName("config").hasArg()
-				.withDescription("configuration file").create("config");
-		Option help = new Option("help", "print this message");
+		Option port = OptionBuilder.withLongOpt("port").withArgName("PORT")
+				.hasArg().withDescription("port to open server on").create("p");
+		Option threads = OptionBuilder.withLongOpt("threads")
+				.withArgName("THREADS").hasArg()
+				.withDescription("number of threads to run").create("t");
+		Option config = OptionBuilder.withLongOpt("config")
+				.withArgName("CONFIG").hasArg()
+				.withDescription("configuration file").create("c");
+		Option help = new Option("h", "help", false, "print this message");
 		Options options = new Options();
 		options.addOption(port);
 		options.addOption(threads);
@@ -91,7 +93,8 @@ public class IllinoisCorefServer {
 
 		configFile = line.getOptionValue("config", "");
 		ClusterGenerator.Iface handler = new IllinoisCorefHandler(configFile);
-		ClusterGenerator.Processor processor = new ClusterGenerator.Processor(handler);
+		ClusterGenerator.Processor processor = new ClusterGenerator.Processor(
+				handler);
 		runServer(processor, port, threads);
 	}
 
