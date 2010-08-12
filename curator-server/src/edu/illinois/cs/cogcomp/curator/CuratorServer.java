@@ -86,7 +86,7 @@ public class CuratorServer {
 		port = Integer.parseInt(line.getOptionValue("port", "9090"));
 
 		try {
-			threads = Integer.parseInt(line.getOptionValue("threads", "1"));
+			threads = Integer.parseInt(line.getOptionValue("threads", "25"));
 		} catch (NumberFormatException e) {
 			logger.warn("Couldn't interpret {} as a number.",
 					line.getOptionValue("threads"));

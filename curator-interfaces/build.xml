@@ -1,7 +1,7 @@
 <project name="curator-interfaces" default="dist" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 	<property name="thrift" location="." />
 	<property name="thrift-gen-java" location="${thrift}/gen-java" />
-	<property name="thrift-args" value="--gen py:new_style --gen php --gen java:hashcode --gen cpp --gen perl --gen rb -r -v" />
+	<property name="thrift-args" value="--gen py:new_style --gen php --gen java:hashcode --gen cpp --gen perl --gen rb --gen html -r -v" />
     <property name="dist" location="dist" />
     
 	<target name="resolve" description="retrieve dependencies with ivy" depends="init-ivy">
@@ -34,19 +34,7 @@
 	<target name="thrift" description="compiles just the thrift interfaces (requires thrift)">
 		<echo>Executing thrift (which needs to be in your path) to build thrift services</echo>
 		<exec executable="thrift" failonerror="true" dir="${thrift}">
-			<arg line="${thrift-args} base.thrift" />
-		</exec>
-		<exec executable="thrift" failonerror="true" dir="${thrift}">
-			<arg line="${thrift-args} curator.thrift" />
-		</exec>
-		<exec executable="thrift" failonerror="true" dir="${thrift}">
-			<arg line="${thrift-args} labeler.thrift" />
-		</exec>
-		<exec executable="thrift" failonerror="true" dir="${thrift}">
-			<arg line="${thrift-args} parser.thrift" />
-		</exec>
-		<exec executable="thrift" failonerror="true" dir="${thrift}">
-			<arg line="${thrift-args} cluster.thrift" />
+			<arg line="${thrift-args} all.thrift" />
 		</exec>
 	</target>
 

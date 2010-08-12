@@ -1,0 +1,55 @@
+Illinois Coference Resolution Server
+====================================
+
+Description
+-----------
+
+This package wraps the Illinois Coference Resolver as a Thrift server using the
+Curator's ClusterGenerator interface. It is designed to be integrated into the
+Curator system.
+
+Usage
+-----
+
+>     $ bin/illinois-coref-server.sh --help
+>     usage: java edu.illinois.cs.cogcomp.annotation.server.IllinoisCorefServer
+>            [-c <CONFIG>] [-h] [-p <PORT>] [-t <THREADS>]
+>      -c,--config <CONFIG>     configuration file
+>      -h,--help                print this message
+>      -p,--port <PORT>         port to open server on
+>      -t,--threads <THREADS>   number of threads to run
+
+
+Installation
+------------
+
+The Illinois Coreference server depends on:
+
+* Java >= 1.5
+* Learning Based Java Library (`LBJ2Library.jar`)
+* Illinois POS Tagger (`LBJPOS.jar`)
+* Illinois Coreference Resolver (`LBJCoref.jar`)
+* Curator interfaces (`curator-interfaces.jar`)
+
+In order to run the server you must install the dependencies.
+
+Download the dependencies and move them to the curator lib directory:
+
+>     $ pwd
+>     /home/james/curator
+>     $ curl -O http://l2r.cs.uiuc.edu/~cogcomp/Software/LBJ2Library.jar
+>     $ mv LBJ2Library.jar lib
+>     $ curl -O http://l2r.cs.uiuc.edu/~cogcomp/Software/LBJPOS.jar
+>     $ mv LBJPOS.jar lib
+>     $ curl -O http://l2r.cs.uiuc.edu/~cogcomp/Software/LBJCoref.jar
+>     $ mv LBJCoref.jar lib
+
+Configuration
+-------------
+
+The Illinois Coreference Server expects the Record object to contain an
+annotation representing the sentence split, tokenization and POS tags.  The file
+configuration file `configs/coref.properties` specifies which fields in the
+Record.labelViews contain this information (defaults to `sentences`, `tokens`
+and `pos` respectively). Optionally it can point to the named entity field
+(which it will use as mentions).

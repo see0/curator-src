@@ -1,7 +1,7 @@
 /**
  * Thrift interface for a labeler.
  *
- * thrift -r --gen <lang> tagger.thrift 
+ * thrift -r --gen <lang> labeler.thrift 
  * James Clarke <clarkeje@gmail.com>
  **/
 
@@ -15,27 +15,23 @@ namespace perl cogcomp.Labeler
 namespace php tagger
 
 /**
- * Tagging service.
+ * Labeling service.
  **/
 service Labeler extends base.BaseService {
   /**
    * Labels a given record.
-   * record - the record
-   * result - list of base.Labeling for the input, one per sentence.
    **/
   base.Labeling labelRecord(1:curator.Record record) throws (1:base.AnnotationFailedException ex),
 
 }
 
-/**
- * Two Taggerg service.
- * Useful for things that tag the text twice. i.e.,
- **/
+/** 
+Multi-Labeler Labeling service. Useful for things that tag the text
+twice. i.e., tokenizers (tokens and sentences).  
+*/
 service MultiLabeler extends base.BaseService {
   /**
-   * Labels a given record.
-   * record - the record
-   * result - list of base.Labeling for the input, one per sentence.
+   * MultiLabels a given record.
    **/
   list<base.Labeling> labelRecord(1:curator.Record record) throws (1:base.AnnotationFailedException ex),
 

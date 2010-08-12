@@ -1,0 +1,96 @@
+Stanford Parser Server
+======================
+
+Description
+-----------
+
+This package wraps the Stanford Parser as a Thrift server using the Curator's
+MultiParser interface. It is designed to be integrated into the Curator
+system. MultiParser's return a list of forests; in this case the first forest is
+the full parse tree and the second forest is the dependency tree. When run in
+kbest mode the nth forest corresponds to the nth best set of trees.
+
+Semantics
+----------
+
+### Parse tree
+
+Parse trees are represented as Forests. Where each Tree corresponds to one
+sentence.
+
+### Dependency tree
+
+Dependency trees are represented as Forests. Where each Tree corresponds to one
+sentence.
+
+The Node object contains the dependency information in the following fields: 
+
+* `node.children` map indicies (positions in tree.nodes) to dependency
+  labels. (i.e., subj, det, etc).
+* `node.label` is always the string "dependency node".
+* `node.span.attributes` map may contain a key "copy" with value "true" if this
+  node is a copy of another node covering the same span. See the Stanford
+  Dependency Manual pg 13.
+
+Usage
+-----
+
+>     $ bin/stanford-parser-server.sh --help
+>     usage: java edu.illinois.cs.cogcomp.annotation.server.StanfordParserServer
+>            [-c <CONFIG>] [-h] [-k] [-p <PORT>] [-t <THREADS>]
+>      -c,--config <CONFIG>     configuration file
+>      -h,--help                print this message
+>      -k,--kbest               run a kbest server
+>      -p,--port <PORT>         port to open server on
+>      -t,--threads <THREADS>   number of threads to run
+
+Installation
+------------
+
+The Stanford Parser Server depends on:
+
+* Java >= 1.5
+* Stanford Parser
+* Stanford Parser model file
+* Curator interfaces (`curator-interfaces.jar`)
+
+In order to run the server you must install the dependencies.
+
+1. Download and extract the Stanford Parser to a temporary location.
+
+ >     $ cd /tmp
+ >     $ curl -O http://nlp.stanford.edu/software/stanford-parser-2010-07-09.tgz
+ >     $ tar xvzf stanford-parser-2010-07-09.tgz
+
+2. Copy `stanford-parser-2010-07-09.jar` to the curator lib directory.
+ 
+ >     $ pwd
+ >     /home/james/curator
+ >     $ cp /tmp/stanford-parser-2010-07-09/stanford-parser-2010-07-09.jar lib
+
+3. Copy the model file `englishPCFG.ser.gz` to the curator's data directory or
+modify `configs/stanford.properties` to point to the model file.
+
+ >     $ pwd
+ >     /home/james/curator
+ >     $ cp /tmp/stanford-parser-2010-07-09/englishPCFG.ser.gz data
+
+
+Configuration
+-------------
+
+The Stanford Parser Server has multiple configuration options and modes of
+operation. 
+
+The default mode of operation is to return the 1-best parse tree and dependency
+tree where the parser obeys the sentence segmentation and tokenization represent
+in the Record object. The configuration file `configs/stanford.properties`
+dictates which labelView fields in the Record contain the sentences and tokens
+annotations.  The server can be configured to perform its own tokenization
+(using the internal tokenizer of the Stanford Parser) by setting `usetokens` to
+`false` (note: the sentence segmentation will still be followed). The
+`stanford.data` property specifies the location of the parser model.
+
+The server can also run in k-best parse tree mode.  Specifying `-kbest` when
+running the server will create a k-best parser (MultiLabeler) using the value
+for k specified in the config property `stanford.k`.

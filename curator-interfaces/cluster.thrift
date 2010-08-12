@@ -1,7 +1,7 @@
 /**
  * Thrift interface for a clusterer.
  *
- * thrift -r --gen <lang> parser.thrift 
+ * thrift -r --gen <lang> cluster.thrift 
  * James Clarke <clarkeje@gmail.com>
  **/
 
@@ -21,10 +21,11 @@ service ClusterGenerator extends base.BaseService {
      
   /**
    * Cluster objects in the Record.
-   * record - the record
-   * result - a base.Clustering for the input
    **/
    base.Clustering clusterRecord(1:curator.Record record) throws (1:base.AnnotationFailedException ex),
 
+  /**
+   * Cluster objects in the list of Records.
+   **/
    base.Clustering clusterRecords(1:list<curator.Record> records) throws (1:base.AnnotationFailedException ex),
 }

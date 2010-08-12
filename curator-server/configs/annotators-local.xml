@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
+
+<!-- this is an example of an annoators configuration file that is purely
+     local -->
+
 <curator-annotators>
 <annotator>
   <type>multilabeler</type>
@@ -20,6 +24,7 @@
   <local>edu.illinois.cs.cogcomp.annotation.handler.IllinoisChunkerHandler</local>
   <requirements>sentences:tokens:pos</requirements>
 </annotator>
+
 <!--
 we cannot run the ner local at the same time as any other annotators that use
 lbj because of version mismatches!
@@ -29,6 +34,7 @@ lbj because of version mismatches!
   <local>edu.illinois.cs.cogcomp.annotation.handler.IllinoisNERHandler</local>
 </annotator>
 -->
+
 <annotator>
   <type>clustergenerator</type>
   <field>coref</field>

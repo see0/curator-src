@@ -77,7 +77,7 @@ public class IllinoisNERServer {
 		port = Integer.parseInt(line.getOptionValue("port", "9090"));
 
 		try {
-			threads = Integer.parseInt(line.getOptionValue("threads", "1"));
+			threads = Integer.parseInt(line.getOptionValue("threads", "2"));
 		} catch (NumberFormatException e) {
 			logger.warn("Couldn't interpret {} as a number.",
 					line.getOptionValue("threads"));
@@ -87,8 +87,6 @@ public class IllinoisNERServer {
 		} else if (threads == 0) {
 			threads = 2;
 		}
-		// force threads to 1 because we cannot support more
-		threads = 1;
 
 		configFile = line.getOptionValue("config", "configs/ner.config");
 		Labeler.Iface handler = new IllinoisNERHandler(configFile);

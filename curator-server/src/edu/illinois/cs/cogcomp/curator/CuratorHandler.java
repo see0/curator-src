@@ -74,6 +74,7 @@ public class CuratorHandler implements Curator.Iface {
 	private final Map<String, String> clientNames = new ConcurrentHashMap<String, String>();
 	private final Map<String, List<String>> multiFields = new HashMap<String, List<String>>();
 	private final Map<String, List<String>> requirements = new HashMap<String, List<String>>();
+	private final Map<String, List<String>> invertedRequirements = new HashMap<String, List<String>>();
 
 	private Archive archive;
 
@@ -133,7 +134,7 @@ public class CuratorHandler implements Curator.Iface {
 				String type = annotator.getString("type");
 				String[] hosts = annotator.getStringArray("host");
 				String[] fields = annotator.getStringArray("field");
-				String requirements = annotator.getString("requirements", "");
+				String[] requirements = annotator.getStringArray("requirement");
 				String local = annotator.getString("local", "");
 
 				if (!local.equals("")) {
@@ -171,12 +172,17 @@ public class CuratorHandler implements Curator.Iface {
 					pools.put(field, pool);
 					counters.put(field, new AtomicInteger());
 					timers.put(field, new AtomicInteger());
-					if (!requirements.equals("")) {
+					if (requirements.length > 0) {
 						// store requirements
-						this.requirements.put(field,
-								Arrays.asList(requirements.split(":")));
+						this.requirements.put(field,Arrays.asList(requirements));
 						logger.debug(field + " requires "
 								+ this.requirements.get(field));
+						for (String dependency : this.requirements.get(field)) {
+							if (!invertedRequirements.containsKey(dependency)) {
+								invertedRequirements.put(dependency, new ArrayList<String>());
+							}
+							invertedRequirements.get(dependency).add(field);
+						}
 					}
 					// store information about fields when multiple annotations
 					// are returned by
@@ -491,7 +497,7 @@ public class CuratorHandler implements Curator.Iface {
 	 * @param record
 	 */
 	private void removeStaleFields(MultiRecord record) {
-
+		//TODO: Implement!
 	}
 
 	/**
@@ -512,10 +518,35 @@ public class CuratorHandler implements Curator.Iface {
 			if (updateRequired(view_name, record)) {
 				logger.debug("Removing stale annotation {}", view_name);
 				it.remove();
+				cascadeRemoveStaleFields(view_name, record);
 			}
 		}
 	}
 
+	/**
+	 * Removes any field that depends on the view_dependency field.
+	 * This is useful for removing all fields that require another field that has 
+	 * recently been updated.
+	 * 
+	 * @param view_dependency
+	 * @param record
+	 */
+	private void cascadeRemoveStaleFields(String view_dependency, Record record) {
+		cascadeRemoveStaleFields(view_dependency, record, record.getLabelViews());
+		cascadeRemoveStaleFields(view_dependency, record, record.getClusterViews());
+		cascadeRemoveStaleFields(view_dependency, record, record.getParseViews());
+		cascadeRemoveStaleFields(view_dependency, record, record.getViews());
+	}
+	
+	private void cascadeRemoveStaleFields(String view_name, Record record, Map<String, ?> views) {
+		for (String dependent : invertedRequirements.get(view_name)) {
+			if (views.containsKey(dependent)) {
+				logger.debug("Removing {} annotation because it depends on {}", dependent, view_name);
+				views.remove(dependent);
+			}
+		}
+	}
+	
 	public void storeRecord(Record record) throws ServiceSecurityException,
 			TException {
 		if (slave || writeaccess) {
@@ -969,11 +1000,10 @@ public class CuratorHandler implements Curator.Iface {
 		return record;
 	}
 
-	public MultiRecord provideMulti(String view_name, String text,
+	public MultiRecord provideMulti(String view_name, List<String> texts,
 			boolean forceUpdate) throws ServiceUnavailableException,
 			AnnotationFailedException, TException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new AnnotationFailedException("provideMulti not yet implemented!");
 	}
 
 	public Record getRecord(String text) throws ServiceUnavailableException,

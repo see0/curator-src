@@ -1,0 +1,61 @@
+Illinois Named Entity Recognition Server
+========================================
+
+Description
+-----------
+
+This package wraps the Illinois Named Entity Recognizer as a Thrift server using
+the Curator's Labeler interface. It is designed to be integrated into the
+Curator system.
+
+Semantics
+---------
+
+The output of the NER server is a Labeling object.  Each Span in the Labeling
+has the following semantics:
+
+* `span.label` contains a string representation of the named entity tag.
+
+Usage
+-----
+
+>     $ bin/illinois-ner-server.sh --help
+>     usage: java edu.illinois.cs.cogcomp.annotation.server.IllinoisNERServer
+>            [-c <CONFIG>] [-h] [-p <PORT>] [-t <THREADS>]
+>      -c,--config <CONFIG>     configuration file
+>      -h,--help                print this message
+>      -p,--port <PORT>         port to open server on
+>      -t,--threads <THREADS>   number of threads to run
+
+Installation
+------------
+
+The Illinois POS server depends on:
+
+* Java >= 1.5
+* Learning Based Java Library 2.2.2 (`LBJ2Library-2.2.2.jar`)
+* Illinois NER Tagger (`LbjNerTagger.jar`)
+* Illinois NER Tagger data files and model files.
+* Curator interfaces (`curator-interfaces.jar`)
+
+In order to run the server you must install the dependencies.
+
+1. Download and extract the Illinois NER server dependencies to a temporary location.
+
+ >     $ cd /tmp
+ >     $ curl -O http://l2r.cs.uiuc.edu/~cogcomp/Software/illinois-ner-server-dependencies.tar.gz
+ >     $ tar xvzf illinois-ner-server-dependencies.tar.gz
+
+2. Copy `LbjNerTagger.jar` and `LBJ2Library-2.2.2.jar` to the curator lib directory.
+
+ >     $ pwd
+ >     /home/james/curator
+ >     $ cp /tmp/illinois-ner-server-dependencies/LBJ2Library-2.2.2.jar lib
+ >     $ cp /tmp/illinois-ner-server-dependencies/LbjNerTagger.jar lib
+
+3. Copy the `ner` directory to the curator's data directory or modify
+`configs/ner.confg` to point to the various paths and files.
+
+ >     $ pwd
+ >     /home/james/curator
+ >     $ cp -R /tmp/illinois-ner-server-dependencies/ner data

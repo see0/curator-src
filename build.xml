@@ -6,6 +6,7 @@
 <property name="deploy.configs" location="${deploy.dir}/configs" />  
 <property name="deploy.data" location="${deploy.dir}/data" />  
 <property name="deploy.lib" location="${deploy.dir}/lib" />  
+<property name="deploy.doc" location="${deploy.dir}/docs" />  
 
 
 
@@ -20,11 +21,19 @@
          <include name="*"/>
        </fileset>
      </copy>
+     <copy file="curator-annotators/@{annotator}/README" tofile="${deploy.doc}/README.@{annotator}" overwrite="true" />
    </sequential>
 </macrodef>
 
 <target name="clean">
-  <delete dir="${deploy.dir}" />
+  <delete dir="${deploy.bin}" />
+  <delete dir="${deploy.components}" />
+  <delete dir="${deploy.configs}" />
+  <delete dir="${deploy.doc}" />
+  <delete dir="${deploy.lib}" />
+  <delete file="${deploy.dir}/logback.xml" />
+  <delete file="${deploy.dir}/build.xml" />
+  <delete file="${deploy.dir}/ivy.xml" />
 </target>
 
 <target name="deploy">
@@ -33,6 +42,7 @@
   <mkdir dir="${deploy.components}" />
   <mkdir dir="${deploy.configs}" />
   <mkdir dir="${deploy.data}" />
+  <mkdir dir="${deploy.doc}" />
   
   <ant antfile="build.xml" dir="curator-interfaces" target="dist" />
   <copy file="curator-interfaces/dist/curator-interfaces.jar" todir="${deploy.components}" overwrite="true" />
@@ -40,7 +50,11 @@
     <fileset dir="curator-interfaces">
       <include name="gen-*/**"/>
       <exclude name="gen-java/**"/>
+      <exclude name="gen-html/**"/>
     </fileset>
+  </copy>
+  <copy todir="${deploy.doc}/interfaces">
+    <fileset dir="curator-interfaces/gen-html" />
   </copy>
   
   <ant antfile="build.xml" dir="curator-server" target="dist" />
@@ -50,6 +64,7 @@
       <include name="*"/>
     </fileset>
   </copy>
+     <copy file="curator-server/README" tofile="${deploy.doc}/README.curator-server" overwrite="true" />
   
   <annotator-deploy annotator="illinois-tokenizer" />
   <annotator-deploy annotator="illinois-pos" />
@@ -61,6 +76,7 @@
   <copy file="build.deployed.xml" tofile="${deploy.dir}/build.xml" overwrite="true" />
   <copy file="ivy.deployed.xml" tofile="${deploy.dir}/ivy.xml" overwrite="true" />
   <copy file="logback.xml" tofile="${deploy.dir}/logback.xml" overwrite="true" />
+  <copy file="INSTALL.deployed" tofile="${deploy.dir}/INSTALL" overwrite="true" />
   
   <copy file="lib/libthrift.jar" todir="${deploy.lib}" overwrite="true" />
 

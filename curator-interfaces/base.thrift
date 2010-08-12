@@ -1,5 +1,5 @@
 /**
- * Base thrift interface for the Cognitive Computation Group Services.
+ * Base thrift interface for the Curator data structures.
  * All services should include this file and inherit from the BaseService
  * and reuse as many of the data structures as possible.
  *
@@ -18,8 +18,15 @@ typedef string Text
 typedef string Source
 
 /**
- * Span
  * Span covers a portion of text.
+ *
+ * <code>start</code> - start index of span in the raw text (inclusive).<br/>
+ * <code>end</code> - end index of span in the raw text (exclusive).<br/>
+ * <code>label</code> - label for span.<br/>
+ * <code>score</code> - score of span.<br/>
+ * <code>source</code> - the source annotator of this span.<br/>
+ * <code>attributes</code> - any additional attributes assoicated with this span. a map of attribute_name => value.<br/>
+ * <code>multiIndex</code> - if associated with a MultiRecord which Record object is this span for.
  **/
 struct Span {
   /**  start index of span in the raw text (inclusive). */
@@ -32,15 +39,19 @@ struct Span {
   4: optional double score,
   /** source of span. */
   5: optional Source source,
-  /** an additional attributes assoicated with this span. */
+  /** any additional attributes assoicated with this span. */
   6: optional map<string, string> attributes,
   /** index of the text (in the multirecord) to which this span references. */
   7: optional i32 multiIndex,
 }
 
 /**
- * Labeling.
- * A labeling of text.  
+ * A labeling of text.  Really a list of Spans.
+ *
+ * <code>labels</code> - the labels for this labeling. Each label represented as a Span.<br/>
+ * <code>source</code> - the source annotator this labeling came from.<br/>
+ * <code>score</code> - the score for this labeling.<br/>
+ * <code>rawText</code> - the raw text for this labeling (if null then consult the labeling's parent's rawText field, i.e., the Record's)
  */
 struct Labeling {
   /**  the labels as spans. */
@@ -54,10 +65,14 @@ struct Labeling {
 }
 
 /**
- * Clustering.
  * A clustering of labels for the text.  Each cluster is represented 
  * as a Labeling which in turn will have labels (list<Span>) 
  * representing each item in the cluster.
+ *
+ * <code>clusters</code> - the clusters for the this clustering. Each cluster represented as a Labeling.<br/>
+ * <code>source</code> - the source annotator this clustering came from.<br/>
+ * <code>score</code> - the score for this clustering.<br/>
+ * <code>rawText</code> - the raw text for this clustering (if null then consult the labeling's parent's rawText field, i.e., the Record's)
  */
 struct Clustering {
   /** the clusters, each cluster is a Labeling. */
@@ -72,10 +87,15 @@ struct Clustering {
 
 
 /**
- * Node.
  * Nodes store their children.  Referenced as index into list<Node> in
  * the containing struct.
  * Here the link between Node can be labeled.
+ * 
+ * <code>label</code> - the label for this Node.<br/>
+ * <code>span</code> - the span this node covers.<br/>
+ * <code>children</code> -  the children of the node represented as a map of <child index, edge label>. Empty string implies no label. The index is the index of the node in the parent data structure (i.e., the tree's nodes).<br/>
+ * <code>source</code> - the source annotator this node came from.<br/>
+ * <code>score</code> - the score for this node.<br/>
  */
 struct Node {
   /** the label of the node. */
@@ -91,8 +111,12 @@ struct Node {
 }
 
 /**
- * Tree
  * Trees are a set of connected nodes with a top node.
+ *
+ * <code>nodes</code> - the list of labeled nodes. <br/>
+ * <code>top</code> - the index in nodes of the top node. <br/>
+ * <code>source</code> - the source annotator this Tree came from.<br/>
+ * <code>score</code> - the score for this Tree.
  */
 struct Tree {
   /** list of labeled nodes. */
@@ -106,8 +130,12 @@ struct Tree {
 }
 
 /**
- * Forest
  * Forest is a set of trees.
+ *
+ * <code>trees</code> - the trees for the this forest.<br/>
+ * <code>source</code> - the source annotator this forest came from.<br/>
+ * <code>score</code> - the score for this forest.<br/>
+ * <code>rawText</code> - the raw text for this forest (if null then consult the labeling's parent's rawText field, i.e., the Record's)
  */
 struct Forest {
   /** the trees in this Forest */
@@ -120,8 +148,13 @@ struct Forest {
 
 
 /**
- * Relation
  * Relations are between two spans.
+ *
+ * <code>start</code> - the index of the span that starts this relation.<br/>
+ * <code>end</code> - the index of the span that ends this relation.<br/>
+ * <code>label</code> - the label for this relation.<br/>
+ * <code>source</code> - where this relation came from.<br/>
+ * <code>score</code> - the score for this relation.<br/>
  */
 struct Relation {
   1: required i32 start,
@@ -132,8 +165,13 @@ struct Relation {
 }
 
 /**
- * View
  * A View is the most general data structure.  Spans and their relations.
+ *
+ * <code>spans</code> - the spans of for this view.<br/>
+ * <code>relations</code> - the relations of this view.<br/>
+ * <code>source</code> - the source annotator this view came from.<br/>
+ * <code>score</code> - the score for this view.<br/>
+ * <code>rawText</code> - the raw text for this view (if null then consult the labeling's parent's rawText field, i.e., the Record's)
  */
 struct View {
   1: required list<Span> spans,
