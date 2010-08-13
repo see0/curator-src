@@ -12,9 +12,9 @@ You should now be able to build everything using ant.
 
  >     $ pwd
  >     /home/james/curator
- >     $ ant deploy
+ >     $ ant dist
 
-This will create a `deploy` directory which contains all the jars, scripts and
+This will create a `dist` directory which contains all the jars, scripts and
 documentation required to run the Curator and the annotators.
 
 Each individual component can be built using ant from the component's
