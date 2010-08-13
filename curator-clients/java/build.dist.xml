@@ -1,0 +1,23 @@
+<project name="curator-client" default="compile" basedir=".">
+
+  <property name="src" location="${basedir}" />
+  <property name="build" location="${basedir}" />
+  <property name="curator.dir" location="../.." />  
+  <property name="curator.components" location="${curator.dir}/components" />  
+  <property name="curator.lib" location="${curator.dir}/lib" />  
+
+
+  <path id="project.classpath">
+    <pathelement location="${curator.components}/curator-interfaces.jar" />
+    <pathelement location="${curator.lib}/libthrift.jar" />
+    <pathelement location="${curator.lib}/slf4j-api-1.5.8.jar" />
+    <pathelement location="${curator.lib}/logback-core-0.9.17.jar" />
+    <pathelement location="${curator.lib}/logback-classic-0.9.17.jar" />
+    <pathelement location="${build}" />
+  </path>
+
+  <target name="compile" description="compile the java files">
+    <javac srcdir="${src}" destdir="${build}" debug="true" classpathref="project.classpath" />
+  </target>
+
+</project>

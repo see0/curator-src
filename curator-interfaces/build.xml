@@ -1,80 +1,80 @@
 <project name="curator-interfaces" default="dist" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-	<property name="thrift" location="." />
-	<property name="thrift-gen-java" location="${thrift}/gen-java" />
-	<property name="thrift-args" value="--gen py:new_style --gen php --gen java:hashcode --gen cpp --gen perl --gen rb --gen html -r -v" />
-    <property name="dist" location="dist" />
-    
-	<target name="resolve" description="retrieve dependencies with ivy" depends="init-ivy">
-      <ivy:resolve file="ivy.xml" />
-      <ivy:retrieve pattern="../lib/[artifact]-[revision].[ext]" />
-      <ivy:cachepath pathid="dependencies.classpath" />
-	</target>
+  <property name="thrift" location="." />
+  <property name="thrift-gen-java" location="${thrift}/gen-java" />
+  <property name="thrift-args" value="--gen py:new_style --gen php --gen java:hashcode --gen cpp --gen perl --gen rb --gen html -r -v" />
+  <property name="dist" location="dist" />
+  
+  <target name="resolve" description="retrieve dependencies with ivy" depends="init-ivy">
+    <ivy:resolve file="ivy.xml" />
+    <ivy:retrieve pattern="../lib/[artifact]-[revision].[ext]" />
+    <ivy:cachepath pathid="dependencies.classpath" />
+  </target>
 
-	<path id="project.classpath">
-		<pathelement location="${thrift-gen-java}" />
-        <pathelement location="../lib/libthrift.jar" />
-        <path refid="dependencies.classpath" />
-	</path>
+  <path id="project.classpath">
+    <pathelement location="${thrift-gen-java}" />
+    <pathelement location="../lib/libthrift.jar" />
+    <path refid="dependencies.classpath" />
+  </path>
 
-	<property name="argument" value="" />
+  <property name="argument" value="" />
 
-	<target name="compile" description="compile the thrift java files" depends="resolve">
-		<javac srcdir="${thrift-gen-java}" destdir="${thrift-gen-java}" debug="true" >
-          <classpath refid="project.classpath" />
-        </javac>
-	</target>
+  <target name="compile" description="compile the thrift java files" depends="resolve">
+    <javac srcdir="${thrift-gen-java}" destdir="${thrift-gen-java}" debug="true" >
+      <classpath refid="project.classpath" />
+    </javac>
+  </target>
 
-	<target name="clean" description="removes all thrift compiled files">
-		<delete includeemptydirs="true">
-			<fileset dir="${thrift}" includes="gen-*/**" />
-		</delete>
-        <delete dir="${dist}"/>
-	</target>
+  <target name="clean" description="removes all thrift compiled files">
+    <delete includeemptydirs="true">
+      <fileset dir="${thrift}" includes="gen-*/**" />
+    </delete>
+    <delete dir="${dist}"/>
+  </target>
 
-	<target name="thrift" description="compiles just the thrift interfaces (requires thrift)">
-		<echo>Executing thrift (which needs to be in your path) to build thrift services</echo>
-		<exec executable="thrift" failonerror="true" dir="${thrift}">
-			<arg line="${thrift-args} all.thrift" />
-		</exec>
-	</target>
+  <target name="thrift" description="compiles just the thrift interfaces (requires thrift)">
+    <echo>Executing thrift (which needs to be in your path) to build thrift services</echo>
+    <exec executable="thrift" failonerror="true" dir="${thrift}">
+      <arg line="${thrift-args} all.thrift" />
+    </exec>
+  </target>
 
-	<target name="dist" description="creates a jar of the interfaces in dist/" depends="clean, thrift, compile">
-		<mkdir dir="${dist}" />
-		<jar destfile="${dist}/curator-interfaces.jar" basedir="${thrift-gen-java}" />
-	</target>
+  <target name="dist" description="creates a jar of the interfaces in dist/" depends="clean, thrift, compile">
+    <mkdir dir="${dist}" />
+    <jar destfile="${dist}/curator-interfaces.jar" basedir="${thrift-gen-java}" />
+  </target>
 
-    <target name="deploy" description="deploys the jar into ../lib" depends="dist">
-      <mkdir dir="${basedir}/../lib" />
-      <copy file="${dist}/curator-interfaces.jar" tofile="${basedir}/../lib/curator-interfaces.jar" overwrite="true" />
-    </target>
+  <target name="deploy" description="deploys the jar into ../lib" depends="dist">
+    <mkdir dir="${basedir}/../lib" />
+    <copy file="${dist}/curator-interfaces.jar" tofile="${basedir}/../lib/curator-interfaces.jar" overwrite="true" />
+  </target>
 
 
 
-	<property name="ivy.install.version" value="2.1.0" />
-	<condition property="ivy.home" value="${env.IVY_HOME}">
-		<isset property="env.IVY_HOME" />
-	</condition>
+  <property name="ivy.install.version" value="2.1.0" />
+  <condition property="ivy.home" value="${env.IVY_HOME}">
+    <isset property="env.IVY_HOME" />
+  </condition>
 
-	<property name="ivy.home" value="${user.home}/.ant" />
-	<property name="ivy.jar.dir" value="${ivy.home}/lib" />
-	<property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+  <property name="ivy.home" value="${user.home}/.ant" />
+  <property name="ivy.jar.dir" value="${ivy.home}/lib" />
+  <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
 
-	<target name="download-ivy" unless="offline">
-		<mkdir dir="${ivy.jar.dir}" />
-		<!-- download Ivy from web site so that it can be used even without any special installation -->
-		<get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true" />
-	</target>
+  <target name="download-ivy" unless="offline">
+    <mkdir dir="${ivy.jar.dir}" />
+    <!-- download Ivy from web site so that it can be used even without any special installation -->
+    <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true" />
+  </target>
 
-	<target name="init-ivy" depends="download-ivy">
-		<!-- try to load ivy here from ivy home, in case the user has not already dropped
-              it into ant's lib dir (note that the latter copy will always take precedence).
-              We will not fail as long as local lib dir exists (it may be empty) and
-              ivy is in at least one of ant's lib dir or the local lib dir. -->
-		<path id="ivy.lib.path">
-			<fileset dir="${ivy.jar.dir}" includes="*.jar" />
-		</path>
-		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
-	</target>
+  <target name="init-ivy" depends="download-ivy">
+    <!-- try to load ivy here from ivy home, in case the user has not already dropped
+         it into ant's lib dir (note that the latter copy will always take precedence).
+         We will not fail as long as local lib dir exists (it may be empty) and
+         ivy is in at least one of ant's lib dir or the local lib dir. -->
+    <path id="ivy.lib.path">
+      <fileset dir="${ivy.jar.dir}" includes="*.jar" />
+    </path>
+    <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
+  </target>
 
 </project>
 

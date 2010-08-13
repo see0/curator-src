@@ -1,92 +1,102 @@
-<project name="curator-packages" default="deploy" basedir=".">
+<project name="curator-packages" default="dist" basedir=".">
 
-<property name="deploy.dir" location="deploy" />  
-<property name="deploy.bin" location="${deploy.dir}/bin" />  
-<property name="deploy.components" location="${deploy.dir}/components" />  
-<property name="deploy.configs" location="${deploy.dir}/configs" />  
-<property name="deploy.data" location="${deploy.dir}/data" />  
-<property name="deploy.lib" location="${deploy.dir}/lib" />  
-<property name="deploy.doc" location="${deploy.dir}/docs" />
-<property name="deploy.clients" location="${deploy.dir}/client-examples" />  
+  <property name="dist.dir" location="dist" />  
+  <property name="dist.bin" location="${dist.dir}/bin" />  
+  <property name="dist.components" location="${dist.dir}/components" />  
+  <property name="dist.configs" location="${dist.dir}/configs" />  
+  <property name="dist.data" location="${dist.dir}/data" />  
+  <property name="dist.lib" location="${dist.dir}/lib" />  
+  <property name="dist.doc" location="${dist.dir}/docs" />
+  <property name="dist.clients" location="${dist.dir}/client-examples" />  
 
+  <macrodef name="annotator-dist">
+    <attribute name="annotator" default="NOT SET"/>
+    <sequential>
+      <ant antfile="build.xml" dir="curator-annotators/@{annotator}" target="dist" />
+      <copy file="curator-annotators/@{annotator}/dist/@{annotator}-server.jar" todir="${dist.components}" overwrite="true" />
+      <copy file="curator-annotators/@{annotator}/@{annotator}-server.sh" todir="${dist.bin}" overwrite="true" />
+      <copy todir="${dist.configs}">
+        <fileset dir="curator-annotators/@{annotator}/configs" erroronmissingdir="false">
+          <include name="*"/>
+        </fileset>
+      </copy>
+      <copy file="curator-annotators/@{annotator}/README.dist" tofile="${dist.doc}/README.@{annotator}" overwrite="true" />
+    </sequential>
+  </macrodef>
 
+  <macrodef name="annotator-clean">
+    <attribute name="annotator" default="NOT SET"/>
+    <sequential>
+      <ant antfile="build.xml" dir="curator-annotators/@{annotator}" target="clean" />
+    </sequential>
+  </macrodef>
 
+  <target name="clean">
+    <delete dir="${dist.dir}" />
+    <annotator-clean annotator="illinois-tokenizer" />
+    <annotator-clean annotator="illinois-pos" />
+    <annotator-clean annotator="illinois-chunker" />
+    <annotator-clean annotator="illinois-ner" />
+    <annotator-clean annotator="illinois-coref" />
+    <annotator-clean annotator="stanford-parser" />
+  </target>
 
-<macrodef name="annotator-deploy">
-   <attribute name="annotator" default="NOT SET"/>
-   <sequential>
-     <ant antfile="build.xml" dir="curator-annotators/@{annotator}" target="dist" />
-     <copy file="curator-annotators/@{annotator}/dist/@{annotator}-server.jar" todir="${deploy.components}" overwrite="true" />
-     <copy file="curator-annotators/@{annotator}/@{annotator}-server.sh" todir="${deploy.bin}" overwrite="true" />
-     <copy todir="${deploy.configs}">
-       <fileset dir="curator-annotators/@{annotator}/configs" erroronmissingdir="false">
-         <include name="*"/>
-       </fileset>
-     </copy>
-     <copy file="curator-annotators/@{annotator}/README.deployed" tofile="${deploy.doc}/README.@{annotator}" overwrite="true" />
-   </sequential>
-</macrodef>
+  <target name="dist">
+    <mkdir dir="${dist.dir}" />
+    <mkdir dir="${dist.bin}" />
+    <mkdir dir="${dist.components}" />
+    <mkdir dir="${dist.configs}" />
+    <mkdir dir="${dist.data}" />
+    <mkdir dir="${dist.doc}" />
+    <mkdir dir="${dist.clients}" />
 
-<target name="clean">
-  <delete dir="${deploy.dir}" />
-</target>
+    
+    <ant antfile="build.xml" dir="curator-interfaces" target="dist" />
+    <copy file="curator-interfaces/dist/curator-interfaces.jar" todir="${dist.components}" overwrite="true" />
+    <copy todir="${dist.components}">
+      <fileset dir="curator-interfaces">
+        <include name="gen-*/**"/>
+        <exclude name="gen-java/**"/>
+        <exclude name="gen-html/**"/>
+      </fileset>
+    </copy>
+    <copy todir="${dist.doc}/interfaces">
+      <fileset dir="curator-interfaces/gen-html" />
+    </copy>
+    
+    <ant antfile="build.xml" dir="curator-server" target="dist" />
+    <copy file="curator-server/dist/curator-server.jar" todir="${dist.components}" overwrite="true" />
+    <copy todir="${dist.configs}">
+      <fileset dir="curator-server/configs">
+        <include name="*"/>
+      </fileset>
+    </copy>
+    <copy file="curator-server/README.dist" tofile="${dist.doc}/README.curator-server" overwrite="true" />
+    
+    <annotator-dist annotator="illinois-tokenizer" />
+    <annotator-dist annotator="illinois-pos" />
+    <annotator-dist annotator="illinois-chunker" />
+    <annotator-dist annotator="illinois-ner" />
+    <annotator-dist annotator="illinois-coref" />
+    <annotator-dist annotator="stanford-parser" />
 
-<target name="deploy">
-  <mkdir dir="${deploy.dir}" />
-  <mkdir dir="${deploy.bin}" />
-  <mkdir dir="${deploy.components}" />
-  <mkdir dir="${deploy.configs}" />
-  <mkdir dir="${deploy.data}" />
-  <mkdir dir="${deploy.doc}" />
-  <mkdir dir="${deploy.clients}" />
+    <copy file="build.dist.xml" tofile="${dist.dir}/build.xml" overwrite="true" />
+    <copy file="ivy.dist.xml" tofile="${dist.dir}/ivy.xml" overwrite="true" />
+    <copy file="logback.xml" tofile="${dist.dir}/logback.xml" overwrite="true" />
+    <copy file="INSTALL.dist" tofile="${dist.dir}/INSTALL" overwrite="true" />
+    <copy file="bootstrap.dist.sh" tofile="${dist.dir}/bootstrap.sh" overwrite="true" />
+    
+    <copy file="lib/libthrift.jar" todir="${dist.lib}" overwrite="true" />
 
-  
-  <ant antfile="build.xml" dir="curator-interfaces" target="dist" />
-  <copy file="curator-interfaces/dist/curator-interfaces.jar" todir="${deploy.components}" overwrite="true" />
-  <copy todir="${deploy.components}">
-    <fileset dir="curator-interfaces">
-      <include name="gen-*/**"/>
-      <exclude name="gen-java/**"/>
-      <exclude name="gen-html/**"/>
-    </fileset>
-  </copy>
-  <copy todir="${deploy.doc}/interfaces">
-    <fileset dir="curator-interfaces/gen-html" />
-  </copy>
-  
-  <ant antfile="build.xml" dir="curator-server" target="dist" />
-  <copy file="curator-server/dist/curator-server.jar" todir="${deploy.components}" overwrite="true" />
-  <copy todir="${deploy.configs}">
-    <fileset dir="curator-server/configs">
-      <include name="*"/>
-    </fileset>
-  </copy>
-  <copy file="curator-server/README.deployed" tofile="${deploy.doc}/README.curator-server" overwrite="true" />
-  
-  <annotator-deploy annotator="illinois-tokenizer" />
-  <annotator-deploy annotator="illinois-pos" />
-  <annotator-deploy annotator="illinois-chunker" />
-  <annotator-deploy annotator="illinois-ner" />
-  <annotator-deploy annotator="illinois-coref" />
-  <annotator-deploy annotator="stanford-parser" />
+    <copy todir="${dist.bin}">
+      <fileset dir="curator-server/scripts" />
+    </copy>
 
-  <copy file="build.deployed.xml" tofile="${deploy.dir}/build.xml" overwrite="true" />
-  <copy file="ivy.deployed.xml" tofile="${deploy.dir}/ivy.xml" overwrite="true" />
-  <copy file="logback.xml" tofile="${deploy.dir}/logback.xml" overwrite="true" />
-  <copy file="INSTALL.deployed" tofile="${deploy.dir}/INSTALL" overwrite="true" />
-  <copy file="bootstrap.deployed.sh" tofile="${deploy.dir}/bootstrap.sh" overwrite="true" />
-  
-  <copy file="lib/libthrift.jar" todir="${deploy.lib}" overwrite="true" />
-
-  <copy todir="${deploy.bin}">
-    <fileset dir="curator-server/scripts" />
-  </copy>
-
-  <copy todir="${deploy.clients}">
-    <fileset dir="curator-clients" />
-  </copy>
-  <move file="${deploy.clients}/java/build.deployed.xml" tofile="${deploy.clients}/java/build.xml" />
-  <move file="${deploy.clients}/java/README.deployed" tofile="${deploy.clients}/java/README" />
+    <copy todir="${dist.clients}">
+      <fileset dir="curator-clients" />
+    </copy>
+    <move file="${dist.clients}/java/build.dist.xml" tofile="${dist.clients}/java/build.xml" />
+    <move file="${dist.clients}/java/README.dist" tofile="${dist.clients}/java/README" />
   </target>
 
 </project>

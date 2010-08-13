@@ -1,76 +1,76 @@
 <project name="curator-server" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-	<property name="src" location="src" />
-	<property name="build" location="bin" />
-	<property name="dist" location="dist" />
-    <property name="class.main" value="edu.illinois.cs.cogcomp.curator.CuratorServer"/>
-    <property name="memory" value="1000m" />
+  <property name="src" location="src" />
+  <property name="build" location="bin" />
+  <property name="dist" location="dist" />
+  <property name="class.main" value="edu.illinois.cs.cogcomp.curator.CuratorServer"/>
+  <property name="memory" value="1000m" />
 
-	<target name="resolve" description="retrieve dependencies with ivy" depends="init-ivy">
-		<ivy:retrieve pattern="../lib/[artifact]-[revision].[ext]" />
-        <ivy:cachepath pathid="dependencies.classpath" />
-	</target>
+  <target name="resolve" description="retrieve dependencies with ivy" depends="init-ivy">
+    <ivy:retrieve pattern="../lib/[artifact]-[revision].[ext]" />
+    <ivy:cachepath pathid="dependencies.classpath" />
+  </target>
 
-	<path id="project.classpath">
-		<pathelement path="${build}" />
-		<pathelement path="configs" />
-        <pathelement path="../lib/curator-interfaces.jar"/>
-        <pathelement path="../lib/libthrift.jar" />
-        <path refid="dependencies.classpath" />
-	</path>
+  <path id="project.classpath">
+    <pathelement path="${build}" />
+    <pathelement path="configs" />
+    <pathelement path="../lib/curator-interfaces.jar"/>
+    <pathelement path="../lib/libthrift.jar" />
+    <path refid="dependencies.classpath" />
+  </path>
 
 
-	<property name="argument" value="" />
+  <property name="argument" value="" />
 
-	<target name="compile" description="compile the curator java files" depends="resolve">
-		<mkdir dir="${build}" />
-		<javac srcdir="${src}" destdir="${build}" debug="true" classpathref="project.classpath" />
-	</target>
+  <target name="compile" description="compile the curator java files" depends="resolve">
+    <mkdir dir="${build}" />
+    <javac srcdir="${src}" destdir="${build}" debug="true" classpathref="project.classpath" />
+  </target>
 
-	<target name="clean" description="removes all java compiled files">
-		<delete dir="${build}" />
-	</target>
+  <target name="clean" description="removes all java compiled files">
+    <delete dir="${build}" />
+  </target>
 
-	<target name="build" depends="compile" description="alias for compile" />
+  <target name="build" depends="compile" description="alias for compile" />
 
-	<target name="rebuild" depends="clean,compile" description="clean everything and recompile" />
+  <target name="rebuild" depends="clean,compile" description="clean everything and recompile" />
 
-   <target name="print" description="print command line to run  the server" depends="compile">
-      <property name="thecp" refid="project.classpath" />
-      <echo>java -Xmx${memory} -classpath ${thecp} ${class.main}</echo>
-    </target>
+  <target name="print" description="print command line to run  the server" depends="compile">
+    <property name="thecp" refid="project.classpath" />
+    <echo>java -Xmx${memory} -classpath ${thecp} ${class.main}</echo>
+  </target>
 
-	<target name="dist" description="creates a jar of the project in dist/" depends="compile">
-		<mkdir dir="${dist}" />
-		<jar destfile="${dist}/curator-server.jar">
-			<fileset dir="${build}" />
-		</jar>
-	</target>
+  <target name="dist" description="creates a jar of the project in dist/" depends="compile">
+    <mkdir dir="${dist}" />
+    <jar destfile="${dist}/curator-server.jar">
+      <fileset dir="${build}" />
+    </jar>
+  </target>
 
-	<property name="ivy.install.version" value="2.1.0" />
-	<condition property="ivy.home" value="${env.IVY_HOME}">
-		<isset property="env.IVY_HOME" />
-	</condition>
+  <property name="ivy.install.version" value="2.1.0" />
+  <condition property="ivy.home" value="${env.IVY_HOME}">
+    <isset property="env.IVY_HOME" />
+  </condition>
 
-	<property name="ivy.home" value="${user.home}/.ant" />
-	<property name="ivy.jar.dir" value="${ivy.home}/lib" />
-	<property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+  <property name="ivy.home" value="${user.home}/.ant" />
+  <property name="ivy.jar.dir" value="${ivy.home}/lib" />
+  <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
 
-	<target name="download-ivy" unless="offline">
-		<mkdir dir="${ivy.jar.dir}" />
-		<!-- download Ivy from web site so that it can be used even without any special installation -->
-		<get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true" />
-	</target>
+  <target name="download-ivy" unless="offline">
+    <mkdir dir="${ivy.jar.dir}" />
+    <!-- download Ivy from web site so that it can be used even without any special installation -->
+    <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true" />
+  </target>
 
-	<target name="init-ivy" depends="download-ivy">
-		<!-- try to load ivy here from ivy home, in case the user has not already dropped
-              it into ant's lib dir (note that the latter copy will always take precedence).
-              We will not fail as long as local lib dir exists (it may be empty) and
-              ivy is in at least one of ant's lib dir or the local lib dir. -->
-		<path id="ivy.lib.path">
-			<fileset dir="${ivy.jar.dir}" includes="*.jar" />
-		</path>
-		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
-	</target>
+  <target name="init-ivy" depends="download-ivy">
+    <!-- try to load ivy here from ivy home, in case the user has not already dropped
+         it into ant's lib dir (note that the latter copy will always take precedence).
+         We will not fail as long as local lib dir exists (it may be empty) and
+         ivy is in at least one of ant's lib dir or the local lib dir. -->
+    <path id="ivy.lib.path">
+      <fileset dir="${ivy.jar.dir}" includes="*.jar" />
+    </path>
+    <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
+  </target>
 
 </project>
 
