@@ -12,15 +12,15 @@
   
   <target name="resolve" description="retrieve dependencies with ivy" depends="init-ivy">
     <ivy:resolve file="ivy.xml" />
-    <ivy:retrieve pattern="${curator-lib}/[artifact]-[revision].[ext]" />
+    <ivy:retrieve pattern="${curator.lib}/[artifact]-[revision].[ext]" />
     <ivy:cachepath pathid="dependencies.classpath" useOrigin="true"/>
   </target>
 
   <path id="project.classpath">
     <pathelement location="${curator.dir}/curator-interfaces/dist/curator-interfaces.jar"/>
     <pathelement location="${curator.lib}/libthrift.jar" />
-    <pathelement location="lib/LBJ2Library-2.2.2.jar" />
-    <pathelement location="lib/LbjNerTagger.jar" />
+    <pathelement location="${curator.lib}/LBJ2Library-2.2.2.jar" />
+    <pathelement location="${curator.lib}/LbjNerTagger.jar" />
     <path refid="dependencies.classpath" />
     <pathelement location="${build}" />
   </path>
