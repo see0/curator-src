@@ -39,6 +39,8 @@
     <annotator-clean annotator="illinois-ner" />
     <annotator-clean annotator="illinois-coref" />
     <annotator-clean annotator="stanford-parser" />
+    <ant antfile="build.xml" dir="curator-interfaces" target="clean" />
+    <ant antfile="build.xml" dir="curator-server" target="clean" />
   </target>
 
   <target name="dist">

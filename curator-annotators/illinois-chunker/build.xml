@@ -1,6 +1,6 @@
 <project name="illinois-chunker-server" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-  
-  <property name="curator-lib" location="../../lib" />
+  <property name="curator.dir" location="../.." />
+  <property name="curator.lib" location="${curator.dir}/lib" />
   <property name="src" location="src" />
   <property name="build" location="bin" />
   <property name="dist" location="dist" />
@@ -17,11 +17,11 @@
   </target>
   
   <path id="project.classpath">
-    <pathelement location="${curator-lib}/curator-interfaces.jar" />
-    <pathelement location="${curator-lib}/libthrift.jar" />
-    <pathelement location="${curator-lib}/LBJ2Library.jar" />
-    <pathelement location="${curator-lib}/LBJPOS.jar" />
-    <pathelement location="${curator-lib}/LBJChunk.jar" />
+    <pathelement path="${curator.dir}/curator-interfaces/dist/curator-interfaces.jar"/>
+    <pathelement location="${curator.lib}/libthrift.jar" />
+    <pathelement location="${curator.lib}/LBJ2Library.jar" />
+    <pathelement location="${curator.lib}/LBJPOS.jar" />
+    <pathelement location="${curator.lib}/LBJChunk.jar" />
     <path refid="dependencies.classpath" />
     <pathelement location="${build}" />
   </path>
