@@ -1,0 +1,20 @@
+Curator Client Example
+======================
+
+`CuratorClient.java` is a simple example of how to connect to a Curator server
+and request annotations.
+
+Installation and Running
+------------------------
+
+Compile the source using ant (assumes `curator/lib` and `curator/components`
+contain he required jars):
+
+ >     $ ant compile
+
+Ensure the an instance of the Curator is running and is providing the following
+annotations: `sentences`, `tokens`, `pos`, `chunk`, `ner`, `stanfordDep`. Run
+`CuratorClient` passing the hostname of the Curator server and port as
+arguments:
+
+ >     $ sh runclient.sh HOSTNAME PORT

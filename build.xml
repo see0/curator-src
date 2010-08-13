@@ -86,6 +86,7 @@
     <fileset dir="curator-clients" />
   </copy>
   <move file="${deploy.clients}/java/build.deployed.xml" tofile="${deploy.clients}/java/build.xml" />
+  <move file="${deploy.clients}/java/README.deployed" tofile="${deploy.clients}/java/README" />
   </target>
 
 </project>
