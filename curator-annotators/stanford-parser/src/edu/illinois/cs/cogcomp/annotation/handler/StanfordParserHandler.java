@@ -38,8 +38,8 @@ import edu.stanford.nlp.util.Pair;
 /**
  * Stanford Parser Handler
  * 
- * Implements TwoParser.Iface to provide phrase structure parse trees and
- * dependency trees for a text or record.
+ * Implements MultiParser.Iface to provide phrase structure parse trees and
+ * dependency trees for a record.
  * 
  * @author James Clarke
  * 
@@ -90,28 +90,36 @@ public class StanfordParserHandler implements MultiParser.Iface {
 	public List<Forest> parseRecord(Record record) throws TException {
 		String rawText = record.getRawText();
 
+		//These are going to store the results
 		Forest parseForest = new Forest();
 		parseForest.setSource(getSourceIdentifier());
 		Forest depForest = new Forest();
 		depForest.setSource(getSourceIdentifier());
 		for (Span sentence : record.getLabelViews().get(sentencesfield).getLabels()) {
-			//int offset = sentence.getStart();
+
+			//now we must create the input to the parser
+			Object input;
 			int offset = 0;
-			Object input = null;
 			String rawsent = rawText.substring(sentence.getStart(), sentence.getEnd());
+			//if we obey the tokenization create a list of Words otherwise just use the string.
 			if (useTokens) {
 				List<Word> s = new ArrayList<Word>();
 				for (Span t : record.getLabelViews().get(tokensfield).getLabels()) {
+					//find tokens that fall within the current sentence.
 					if (t.getStart() >= sentence.getStart() && t.getEnd() <= sentence.getEnd()) {
+						//Stanford's Word(string rep, start position, end position)
 						s.add(new Word(rawText.substring(t.getStart(), t.getEnd()), t.getStart(), t.getEnd()));
 					}
 				}
 				input = s;
 			} else {
 				input = rawsent;
+				//we need to track offset of the sentence if we use the text.
 				offset = sentence.getStart();
 			}
+			//get a Stanford parse representation
 			edu.stanford.nlp.trees.Tree parse = parse(input);
+			
 			for (edu.stanford.nlp.trees.Tree pt : parse.getChildrenAsList()) {
 				Tree tree = new Tree();
 				Node top = generateNode(pt, tree, offset);
@@ -160,6 +168,14 @@ public class StanfordParserHandler implements MultiParser.Iface {
 		return result;
 	}
 
+	/**
+	 * Convert a Stanford parse tree to a dependency tree and then to a Curator Tree
+	 * @param parse
+	 * @param offset
+	 * @param input
+	 * @return
+	 * @throws TException
+	 */
 	private synchronized List<Tree> parseToDependencyTree(
 			edu.stanford.nlp.trees.Tree parse, int offset, String input)
 			throws TException {
@@ -168,6 +184,7 @@ public class StanfordParserHandler implements MultiParser.Iface {
 		GrammaticalStructureFactory gsf = tlp.grammaticalStructureFactory();
 		GrammaticalStructure gs = gsf.newGrammaticalStructure(parse);
 		Collection<TypedDependency> tdl = gs.typedDependenciesCollapsedTree();
+		
 		// position in sentence, Node and position in nodes
 		Map<Integer, Pair<Node, Integer>> mainNodeMap = new HashMap<Integer, Pair<Node, Integer>>();
 		// will store any copy nodes
@@ -179,47 +196,53 @@ public class StanfordParserHandler implements MultiParser.Iface {
 		
 		//THIS IS CODE TO WORK AROUND TWO HEADS PROBLEM IN STANFORD 1.6.1
 		//maps td.dep().index() to => tdl
-//		Map<Integer, TypedDependency> heads = new HashMap<Integer, TypedDependency>();
-//		int bcount = -1;
-//		for (TypedDependency td : tdl) {
-//			if ((td.dep().label().get(CopyAnnotation.class) != null
-//					&& td.dep().label().get(CopyAnnotation.class)) || (td.gov().label().get(CopyAnnotation.class) != null
-//					&& td.gov().label().get(CopyAnnotation.class))) {
-//				//special case for copies
-//				heads.put(bcount, td);
-//				bcount--;
-//			} else if (!heads.containsKey(td.dep().index())) {
-//				heads.put(td.dep().index(), td);
-//			} else if (td.reln().toString().equals("pobj")){
-//				//we don't want to add pobj
-//				logger.warn("Removing dependency: {}", td);
-//				continue;
-//			} else {
-//				TypedDependency td2 = heads.get(td.dep().index());
-//				if (td2.reln().toString().equals("pobj")) {
-//					//replace with current dep
-//					logger.warn("Removing dependency: {}", td2);
-//					heads.put(td.dep().index(), td);
-//				} else if (td2.equals(td)) {
-//					//case when stanford parser produces duplicate deps
-//					logger.warn("Removing depdendency: {}", td);
-//				} else {
-//					logger.error("FOUND WORD WITH TWO HEADS!!!");
-//					logger.error("{} and {}", td, td2);
-//					logger.error("Input: {}", input);
-//					logger.error("Parse: {}", parse.toString());
-//					logger.error("Dependencies: {}", tdl);
-//					return null;					
-//				}
-//			}
-//		}
-//		tdl = heads.values();
+/*
+		Map<Integer, TypedDependency> heads = new HashMap<Integer, TypedDependency>();
+		int bcount = -1;
+		for (TypedDependency td : tdl) {
+			if ((td.dep().label().get(CopyAnnotation.class) != null
+					&& td.dep().label().get(CopyAnnotation.class)) || (td.gov().label().get(CopyAnnotation.class) != null
+					&& td.gov().label().get(CopyAnnotation.class))) {
+				//special case for copies
+				heads.put(bcount, td);
+				bcount--;
+			} else if (!heads.containsKey(td.dep().index())) {
+				heads.put(td.dep().index(), td);
+			} else if (td.reln().toString().equals("pobj")){
+				//we don't want to add pobj
+				logger.warn("Removing dependency: {}", td);
+				continue;
+			} else {
+				TypedDependency td2 = heads.get(td.dep().index());
+				if (td2.reln().toString().equals("pobj")) {
+					//replace with current dep
+					logger.warn("Removing dependency: {}", td2);
+					heads.put(td.dep().index(), td);
+				} else if (td2.equals(td)) {
+					//case when stanford parser produces duplicate deps
+					logger.warn("Removing depdendency: {}", td);
+				} else {
+					logger.error("FOUND WORD WITH TWO HEADS!!!");
+					logger.error("{} and {}", td, td2);
+					logger.error("Input: {}", input);
+					logger.error("Parse: {}", parse.toString());
+					logger.error("Dependencies: {}", tdl);
+					return null;					
+				}
+			}
+		}
+		tdl = heads.values();
+		*/
 		//END WORK AROUND!!
 
 		//we will bind this nodeMap to the correct one as we build
 		Map<Integer, Pair<Node, Integer>> nodeMap;
 		Set<TypedDependency> seen = new HashSet<TypedDependency>();
 		Set<TreeGraphNode> hasHeads = new HashSet<TreeGraphNode>();
+		
+		//TODO: this part needs documenting since it is quite involved
+		//basically we have to convert from Stanford's td which are pairs
+		//of words into a Tree structure.
 		for (TypedDependency td : tdl) {
 			logger.debug("{} duplicate? {}", td, seen.contains(td));
 			logger.debug("has heads: {}", hasHeads.contains(td.dep()));
@@ -306,7 +329,7 @@ public class StanfordParserHandler implements MultiParser.Iface {
 			}
 			headNode.getChildren().put(depNodePos, td.reln().toString());
 			nodesWithHeads.add(depNodePos);
-		}
+		}// end for td
 
 		Set<Integer> headNodes = new HashSet<Integer>();
 
@@ -329,12 +352,6 @@ public class StanfordParserHandler implements MultiParser.Iface {
 				return null;
 			}
 		}
-		// if (trees.isEmpty()) {
-		// logger.error("Trees empty");
-		// logger.error("Parse: {}", parse.toString());
-		// logger.error("Dependencies: {}", tdl);
-		// return null;
-		// }
 		return trees;
 	}
 
@@ -364,6 +381,14 @@ public class StanfordParserHandler implements MultiParser.Iface {
 		return current;
 	}
 
+	
+	/**
+	 * Converts a Stanford Word to a Curator Span
+	 * @param word
+	 * @param offset
+	 * @return
+	 * @throws TException
+	 */
 	private Span wordToSpan(Word word, int offset) throws TException {
 		Span span = new Span();
 		span.setStart(word.beginPosition() + offset);
@@ -371,6 +396,16 @@ public class StanfordParserHandler implements MultiParser.Iface {
 		return span;
 	}
 
+	/**
+	 * Takes a Stanford Tree and Curator Tree and recursively populates the Curator
+	 * Tree to match the Stanford Tree.
+	 * Returns the top Node of the tree.
+	 * @param parse Stanford Tree
+	 * @param tree Curator Tree
+	 * @param offset Offset of where we are in the rawText
+	 * @return top Node of the Tree
+	 * @throws TException
+	 */
 	private Node generateNode(edu.stanford.nlp.trees.Tree parse, Tree tree,
 			int offset) throws TException {
 		if (!tree.isSetNodes()) {
@@ -389,6 +424,7 @@ public class StanfordParserHandler implements MultiParser.Iface {
 			} else {
 				Node child = generateNode(pt, tree, offset);
 				nodes.add(child);
+				//no arc label for children in parse trees
 				node.getChildren().put(nodes.size() - 1, "");
 			}
 		}
@@ -404,4 +440,6 @@ public class StanfordParserHandler implements MultiParser.Iface {
 	public String getSourceIdentifier() throws TException {
 		return "stanfordparser-" + getVersion();
 	}
+	
+
 }

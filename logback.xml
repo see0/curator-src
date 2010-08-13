@@ -10,7 +10,7 @@
   <file>logs/${HOSTNAME:-unknown}-servers.log</file>
   <prudent>true</prudent>
   <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-    <FileNamePattern>logs/dated/${servername:-unknown}-servers.%d{yyyy-MM-dd}.log</FileNamePattern>
+    <FileNamePattern>logs/dated/${HOSTNAME:-unknown}-servers.%d{yyyy-MM-dd}.log</FileNamePattern>
     <MaxHistory>10</MaxHistory>
   </rollingPolicy>
   
@@ -19,7 +19,7 @@
   </layout>
 </appender>
 
-<root level="${loggerlevel:-INFO}">
+<root level="${loggerlevel:-DEBUG}">
   <appender-ref ref="STDOUT" />
   <appender-ref ref="FILE" />
 </root>

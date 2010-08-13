@@ -1,0 +1,21 @@
+Installing the Curator
+======================
+
+Download the dependencies for the Curator using ant.
+
+ >     $ pwd
+ >     /home/james/curator
+ >     $ ant
+
+Read the README.* files in `docs` for instructions on downloading and installing
+the remaining dependencies for each server you are interested in. OR just run
+`boostrap.sh` to download and install everything.
+
+ >     $ pwd
+ >     /home/james/curator
+ >     $ sh bootstrap.sh
+
+Follow the usage and configuration information in README.* for each server.
+
+`docs/interfaces/index.html` provides information on the data structures and
+methods provided by the Curator.

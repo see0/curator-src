@@ -1,0 +1,69 @@
+Curator Server
+==============
+
+Description
+-----------
+
+The Curator is a text annotation broker.  It is responsible for providing
+annotations of texts and storing annotations. 
+
+Usage
+-----
+
+>     $ bin/curator.sh --help
+>     usage: java edu.illinois.cs.cogcomp.curator.CuratorServer [-a
+>            <ANNOTATORS>] [-c <CONFIG>] [-h] [-p <PORT>] [-t <THREADS>]
+>      -a,--annotators <ANNOTATORS>   annotators configuration file
+>                                     (annotators.xml)
+>      -c,--config <CONFIG>           configuration file (curator.properties)
+>      -h,--help                      print this message
+>      -p,--port <PORT>               port to open server on
+>      -t,--threads <THREADS>         number of threads to run
+
+Installation
+------------
+
+Download the dependencies for the Curator using ant.
+
+ >     $ pwd
+ >     /home/james/curator
+ >     $ ant
+
+Configuration
+-------------
+
+There are three configuration files:
+
+* `curator.properties` - controls the basic behavior of the curator
+  (documented).  
+* `database.properties` - controls the behavior of the database cache such as
+  how long to cache records and how often to perform maintenance.
+
+* `annotators.xml` - specifies the annotators to use.
+
+
+### annotators.xml
+
+`annotators.xml` controls the services available through the curator. Each
+annotator is described by a structured xml node called `annotator` containing:
+
+* One `type` node with value of either `labeler`, `clutsergenerator`, `parser`,
+  `multilabeler`, or `multiparser`.  This specifies the curator thrift servie
+  the annotator implements.
+
+* One or more (in the case of multi-annotators) `field` nodes. The value of the
+  field node specifies what key the annotation will be stored in the `Record`
+  object.
+
+* One or more `requirement` nodes.  Each requirement node specifies to an
+  annotation name that must be performed before the current annotator can run.
+
+* Either a `local` node or one or more `host` nodes.
+
+  * `host` nodes specify the hostname and port number of the annotation server
+    in form `hostname:port`. Multiple `host` nodes can be declared and the
+    Curator will automatically call non-busy hosts for the annotation.
+
+  * `local` nodes declare the full package and classname of the class
+    implementing the Iface.  This class will be loaded locally internally within
+    the Curator and annotations will be performed within the Curator's JVM.

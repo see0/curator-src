@@ -1,0 +1,21 @@
+Developing for the Curator
+==========================
+
+First download all the dependencies and data files that are unavailable via
+maven repos using the `boostrap.sh` script:
+
+ >     $ pwd
+ >     /home/james/curator
+ >     $ sh bootstrap.sh
+
+You should now be able to build everything using ant.
+
+ >     $ pwd
+ >     /home/james/curator
+ >     $ ant deploy
+
+This will create a `deploy` directory which contains all the jars, scripts and
+documentation required to run the Curator and the annotators.
+
+Each individual component can be built using ant from the component's
+directory. Some even have test targets.
