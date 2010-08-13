@@ -17,7 +17,7 @@
   </target>
   
   <path id="project.classpath">
-    <pathelement path="${curator.dir}/curator-interfaces/dist/curator-interfaces.jar"/>
+    <pathelement location="${curator.dir}/curator-interfaces/dist/curator-interfaces.jar"/>
     <pathelement location="${curator.lib}/libthrift.jar" />
     <pathelement location="${curator.lib}/LBJ2Library.jar" />
     <pathelement location="${curator.lib}/LBJPOS.jar" />

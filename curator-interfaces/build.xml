@@ -1,4 +1,6 @@
 <project name="curator-interfaces" default="dist" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+  <property name="curator.dir" location=".." />
+  <property name="curator.lib" location="${curator.dir}/lib" />
   <property name="thrift" location="." />
   <property name="thrift-gen-java" location="${thrift}/gen-java" />
   <property name="thrift-args" value="--gen py:new_style --gen php --gen java:hashcode --gen cpp --gen perl --gen rb --gen html -r -v" />
@@ -6,13 +8,13 @@
   
   <target name="resolve" description="retrieve dependencies with ivy" depends="init-ivy">
     <ivy:resolve file="ivy.xml" />
-    <ivy:retrieve pattern="../lib/[artifact]-[revision].[ext]" />
+    <ivy:retrieve pattern="${curator.lib}/[artifact]-[revision].[ext]" />
     <ivy:cachepath pathid="dependencies.classpath" />
   </target>
 
   <path id="project.classpath">
     <pathelement location="${thrift-gen-java}" />
-    <pathelement location="../lib/libthrift.jar" />
+    <pathelement location="${curator.lib}/libthrift.jar" />
     <path refid="dependencies.classpath" />
   </path>
 
