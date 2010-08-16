@@ -15,14 +15,17 @@
   <type>labeler</type>
   <field>pos</field>
   <local>edu.illinois.cs.cogcomp.annotation.handler.IllinoisPOSHandler</local>
-  <requirements>sentences:tokens</requirements>
+  <requirement>sentences</requirement>
+  <requirement>tokens</requirement>
 </annotator>
 
 <annotator>
   <type>labeler</type>
   <field>chunk</field>
   <local>edu.illinois.cs.cogcomp.annotation.handler.IllinoisChunkerHandler</local>
-  <requirements>sentences:tokens:pos</requirements>
+  <requirement>sentences</requirement>
+  <requirement>tokens</requirement>
+  <requirement>pos</requirement>
 </annotator>
 
 <!--
@@ -39,7 +42,10 @@ lbj because of version mismatches!
   <type>clustergenerator</type>
   <field>coref</field>
   <local>edu.illinois.cs.cogcomp.annotation.handler.IllinoisCorefHandler</local>
-  <requirements>sentences:tokens:pos:ner</requirements>
+  <requirement>sentences</requirement>
+  <requirement>tokens</requirement>
+  <requirement>pos</requirement>
+  <requirement>ner</requirement>
 </annotator>
 
 <annotator>
@@ -47,7 +53,8 @@ lbj because of version mismatches!
   <field>stanfordParse</field>
   <field>stanfordDep</field>
   <local>edu.illinois.cs.cogcomp.annotation.handler.StanfordParserHandler</local>
-  <requirements>sentences:tokens</requirements>
+  <requirement>tokens</requirement>
+  <requirement>sentences</requirement>
 </annotator>
 
 </curator-annotators>
