@@ -106,7 +106,7 @@ public class CuratorClient {
         System.out.println("Named Entities\n---------\n");
 		for (Span span : record.getLabelViews().get("ner").getLabels()) {
 			System.out.println(span.getLabel() + " : "
-					+ record.getRawText().substring(span.getStart(), span.getEnd()));
+					+ record.getRawText().substring(span.getStart(), span.getEnding()));
 		}
 		System.out.println();
 		System.out.println();
@@ -133,12 +133,12 @@ public class CuratorClient {
 				"This is because pos tags are required for chunking.  And tokenization is required by the pos tagger");
 		System.out.println("\nSentences\n--------\n");
 		for (Span span : record.getLabelViews().get("sentences").getLabels()) {
-			System.out.println("# " +record.getRawText().substring(span.getStart(), span.getEnd()));
+			System.out.println("# " +record.getRawText().substring(span.getStart(), span.getEnding()));
 		}
 		System.out.println("\nPOS Tags\n------\n");
 		StringBuffer result = new StringBuffer();
 		for (Span span : record.getLabelViews().get("pos").getLabels()) {
-			result.append(record.getRawText().substring(span.getStart(), span.getEnd()) + "/" + span.getLabel());
+			result.append(record.getRawText().substring(span.getStart(), span.getEnding()) + "/" + span.getLabel());
 			result.append(" ");
 		}
 		System.out.println(result.toString());
@@ -147,7 +147,7 @@ public class CuratorClient {
 		result = new StringBuffer();
 		for (Span span : record.getLabelViews().get("chunk").getLabels()) {
 			result.append("["+span.getLabel()+ " ");
-			result.append(record.getRawText().substring(span.getStart(), span.getEnd()));
+			result.append(record.getRawText().substring(span.getStart(), span.getEnding()));
 			result.append("] ");
 		}
 		System.out.println(result.toString());
@@ -185,9 +185,9 @@ public class CuratorClient {
 					String relation = head.getChildren().get(childIndex);
 					result.append(relation);
 					result.append("(");
-					result.append(record.getRawText().substring(head.getSpan().getStart(), head.getSpan().getEnd()));
+					result.append(record.getRawText().substring(head.getSpan().getStart(), head.getSpan().getEnding()));
 					result.append(", ");
-					result.append(record.getRawText().substring(child.getSpan().getStart(), child.getSpan().getEnd()));
+					result.append(record.getRawText().substring(child.getSpan().getStart(), child.getSpan().getEnding()));
 					result.append(")\n");
 				}
 			}
