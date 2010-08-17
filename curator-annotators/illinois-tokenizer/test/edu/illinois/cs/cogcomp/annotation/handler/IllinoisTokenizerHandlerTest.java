@@ -35,10 +35,10 @@ public class IllinoisTokenizerHandlerTest {
 		int index = 0;
 		for (Span sentence : labeling.get(0).getLabels()) {
 			System.out.println(text.substring(sentence.getStart(),
-					sentence.getEnd()));
+					sentence.getEnding()));
 			assertEquals(sentenceOffsets[index], sentence.getStart());
 			index++;
-			assertEquals(sentenceOffsets[index], sentence.getEnd());
+			assertEquals(sentenceOffsets[index], sentence.getEnding());
 			index++;
 		}
 		index = 0;
@@ -48,10 +48,10 @@ public class IllinoisTokenizerHandlerTest {
 				95, 95, 96 };
 		for (Span token : labeling.get(1).getLabels()) {
 			System.out.println(text.substring(token.getStart(),
-					token.getEnd()));
+					token.getEnding()));
 			assertEquals(tokenOffsets[index], token.getStart());
 			index++;
-			assertEquals(tokenOffsets[index], token.getEnd());
+			assertEquals(tokenOffsets[index], token.getEnding());
 			index++;
 		}
 	}

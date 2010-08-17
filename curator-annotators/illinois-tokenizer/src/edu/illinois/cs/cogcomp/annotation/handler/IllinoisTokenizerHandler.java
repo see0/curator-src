@@ -38,12 +38,12 @@ public class IllinoisTokenizerHandler implements MultiLabeler.Iface {
 				Word word = (Word) words.get(i);
 				Span token = new Span();
 				token.setStart(word.start);
-				token.setEnd(word.end + 1);
+				token.setEnding(word.end + 1);
 				tokens.add(token);
 			}
 			Span span = new Span();
 			span.setStart(s.start);
-			span.setEnd(s.end + 1);
+			span.setEnding(s.end + 1);
 			sentences.add(span);
 		}
 

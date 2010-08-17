@@ -88,7 +88,7 @@ public class IllinoisChunkerHandler implements Labeler.Iface {
 					logger.warn(rawText);
 				}
 			} else if ((lbjtoken.type.charAt(0) == 'B' || lbjtoken.type.charAt(0) == 'O') && label !=null) {
-				label.setEnd(previous.getEnd());
+				label.setEnding(previous.getEnding());
 				labels.add(label);
 				label = null;
 			}
@@ -102,7 +102,7 @@ public class IllinoisChunkerHandler implements Labeler.Iface {
 			tcounter++;
 		}
 		if (label != null) {
-			label.setEnd(previous.getEnd());
+			label.setEnding(previous.getEnding());
 			labels.add(label);
 		}
 		labeling.setLabels(labels);
@@ -148,7 +148,7 @@ public class IllinoisChunkerHandler implements Labeler.Iface {
 			do {
 				tag = tags.get(j);
 				Word wcurrent;
-				String token = rawText.substring(tag.getStart(), tag.getEnd());
+				String token = rawText.substring(tag.getStart(), tag.getEnding());
 				if (token.equals("\"")) {
 					token = opendblquote ? "``" : "''";
 					opendblquote = !opendblquote;
@@ -175,7 +175,7 @@ public class IllinoisChunkerHandler implements Labeler.Iface {
 				wprevious = wcurrent;
 				tprevious = tcurrent;
 				j++;
-			} while (tag.getEnd() < sentence.getEnd());
+			} while (tag.getEnding() < sentence.getEnding());
 
 		}
 		return lbjTokens;

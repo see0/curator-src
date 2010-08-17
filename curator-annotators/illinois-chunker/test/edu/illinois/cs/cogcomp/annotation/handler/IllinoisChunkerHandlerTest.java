@@ -78,10 +78,10 @@ public class IllinoisChunkerHandlerTest {
 		int index = 0;
 		int index2 = 0;
 		for (Span tag : labeling.getLabels()) {
-			System.out.println(text.subSequence(tag.getStart(), tag.getEnd())+ "\t"+tag.getLabel());
+			System.out.println(text.subSequence(tag.getStart(), tag.getEnding())+ "\t"+tag.getLabel());
 			assertEquals(chunkOffsets[index], tag.getStart());
 			index++;
-			assertEquals(chunkOffsets[index], tag.getEnd());
+			assertEquals(chunkOffsets[index], tag.getEnding());
 			index++;
 			assertEquals(chunkLabels[index2], tag.getLabel());
 			index2++;

@@ -60,10 +60,10 @@ public class Whitespacer {
 		Labeling s = sentences(sentences);
 		Labeling t = tokenize(sentences);
 		for (Span span : t.getLabels()) {
-			System.out.println(rawText.substring(span.getStart(), span.getEnd()));
+			System.out.println(rawText.substring(span.getStart(), span.getEnding()));
 		}
 		for (Span span : s.getLabels()) {
-			System.out.println(rawText.substring(span.getStart(), span.getEnd()));
+			System.out.println(rawText.substring(span.getStart(), span.getEnding()));
 		}
 	}
 }

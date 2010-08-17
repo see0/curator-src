@@ -80,12 +80,12 @@ public class StringUtil {
 	 * @return
 	 */
 	public static String spanToString(Span span, String rawText) {
-		if (span.getEnd() > rawText.length()) {
+		if (span.getEnding() > rawText.length()) {
 			logger.error("Span end is greater than rawText length");
 			logger.error("Raw Text: {}", rawText);
 			logger.error("Span: {}", span);
 		}
-		return rawText.substring(span.getStart(), span.getEnd());
+		return rawText.substring(span.getStart(), span.getEnding());
 	}
 
 	/**
@@ -146,13 +146,13 @@ public class StringUtil {
 		Span sentence = sentences.get(sentNum);
 		strTokens.add(new ArrayList<String>());
 		for (Span token : tokens) {
-			if (token.getStart() >= sentence.getEnd()) {
+			if (token.getStart() >= sentence.getEnding()) {
 				strTokens.add(new ArrayList<String>());
 				sentNum++;
 				sentence = sentences.get(sentNum);
 			}
 			strTokens.get(sentNum).add(
-					rawText.substring(token.getStart(), token.getEnd()));
+					rawText.substring(token.getStart(), token.getEnding()));
 		}
 		return strTokens;
 	}

@@ -114,7 +114,7 @@ public class SRLHandler implements Parser.Iface {
 				int startend[] = StringUtil.findSpan(location, sentenceText,
 						items[0]);
 				span.setStart(startend[0] + sentence.getStart());
-				span.setEnd(startend[1] + sentence.getStart());
+				span.setEnding(startend[1] + sentence.getStart());
 				span.setAttributes(new HashMap<String, String>());
 				span.getAttributes().put("predicate", predicate);
 				location = startend[1];
@@ -174,7 +174,7 @@ public class SRLHandler implements Parser.Iface {
 					if (!label.equals("V")) {
 						Span span = new Span();
 						span.setStart(start + sentence.getStart());
-						span.setEnd(end + sentence.getStart());
+						span.setEnding(end + sentence.getStart());
 
 						Node arg = new Node();
 						arg.setSpan(span);

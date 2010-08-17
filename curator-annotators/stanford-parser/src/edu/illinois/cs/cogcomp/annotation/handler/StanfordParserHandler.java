@@ -100,15 +100,15 @@ public class StanfordParserHandler implements MultiParser.Iface {
 			//now we must create the input to the parser
 			Object input;
 			int offset = 0;
-			String rawsent = rawText.substring(sentence.getStart(), sentence.getEnd());
+			String rawsent = rawText.substring(sentence.getStart(), sentence.getEnding());
 			//if we obey the tokenization create a list of Words otherwise just use the string.
 			if (useTokens) {
 				List<Word> s = new ArrayList<Word>();
 				for (Span t : record.getLabelViews().get(tokensfield).getLabels()) {
 					//find tokens that fall within the current sentence.
-					if (t.getStart() >= sentence.getStart() && t.getEnd() <= sentence.getEnd()) {
+					if (t.getStart() >= sentence.getStart() && t.getEnding() <= sentence.getEnding()) {
 						//Stanford's Word(string rep, start position, end position)
-						s.add(new Word(rawText.substring(t.getStart(), t.getEnd()), t.getStart(), t.getEnd()));
+						s.add(new Word(rawText.substring(t.getStart(), t.getEnding()), t.getStart(), t.getEnding()));
 					}
 				}
 				input = s;
@@ -392,7 +392,7 @@ public class StanfordParserHandler implements MultiParser.Iface {
 	private Span wordToSpan(Word word, int offset) throws TException {
 		Span span = new Span();
 		span.setStart(word.beginPosition() + offset);
-		span.setEnd(word.endPosition() + offset);
+		span.setEnding(word.endPosition() + offset);
 		return span;
 	}
 
@@ -431,7 +431,7 @@ public class StanfordParserHandler implements MultiParser.Iface {
 		Span span = new Span();
 		List<Word> words = parse.yield();
 		span.setStart(words.get(0).beginPosition() + offset);
-		span.setEnd(words.get(words.size() - 1).endPosition() + offset);
+		span.setEnding(words.get(words.size() - 1).endPosition() + offset);
 		node.setSpan(span);
 
 		return node;

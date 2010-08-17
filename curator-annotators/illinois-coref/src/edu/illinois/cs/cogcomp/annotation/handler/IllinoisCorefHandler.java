@@ -108,8 +108,8 @@ public class IllinoisCorefHandler implements ClusterGenerator.Iface {
 			List<Mention> mentions = new ArrayList<Mention>();
 			Labeling nes = record.getLabelViews().get(nerfield);
 			for (Span span : nes.getLabels()) {
-				Chunk c = new Chunk(doc, span.getStart(), span.getEnd() - 1,
-						rawText.substring(span.getStart(), span.getEnd()));
+				Chunk c = new Chunk(doc, span.getStart(), span.getEnding() - 1,
+						rawText.substring(span.getStart(), span.getEnding()));
 				Mention m = new Mention(doc, c);
 				m.setType("NAM");
 				m.setEntityType(span.getLabel());
@@ -136,7 +136,7 @@ public class IllinoisCorefHandler implements ClusterGenerator.Iface {
 				Chunk c = m.getExtent();
 				Span span = new Span();
 				span.setStart(c.getStart());
-				span.setEnd(c.getEnd() + 1);
+				span.setEnding(c.getEnd() + 1);
 				if (!m.getEntityID().equals("NONE"))
 					span.setLabel(m.getEntityID());
 				labels.add(span);
@@ -178,8 +178,8 @@ public class IllinoisCorefHandler implements ClusterGenerator.Iface {
 				Labeling nes = record.getLabelViews().get(nerfield);
 				for (Span span : nes.getLabels()) {
 					Chunk c = new Chunk(doc, offset + span.getStart(), offset
-							+ span.getEnd() - 1, record.getRawText().substring(
-							span.getStart(), span.getEnd()));
+							+ span.getEnding() - 1, record.getRawText().substring(
+							span.getStart(), span.getEnding()));
 					Mention m = new Mention(doc, c);
 					m.setType("NAM");
 					m.setEntityType(span.getLabel());
@@ -206,7 +206,7 @@ public class IllinoisCorefHandler implements ClusterGenerator.Iface {
 			int offset = offsets.get(i);
 			if (span.getStart() < offset) {
 				span.setStart(span.getStart() - previous);
-				span.setEnd(span.getEnd() - previous);
+				span.setEnding(span.getEnding() - previous);
 				span.setMultiIndex(i);
 				adjusted = true;
 				break;

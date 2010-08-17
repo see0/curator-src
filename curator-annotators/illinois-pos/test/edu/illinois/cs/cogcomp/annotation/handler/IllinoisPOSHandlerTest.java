@@ -57,7 +57,7 @@ public class IllinoisPOSHandlerTest {
 		String[] posTags = {"NNP", "VBD", "NNP", "VBP", "DT", "NN", "IN", "DT", "NN", "NN", "."};
 		int index = 0;
 		for (Span tag : labeling.getLabels()) {
-			System.out.println(text.subSequence(tag.getStart(), tag.getEnd())+ "\t"+tag.getLabel());
+			System.out.println(text.subSequence(tag.getStart(), tag.getEnding())+ "\t"+tag.getLabel());
 			assertEquals(posTags[index], tag.getLabel());
 			index++;
 		}
@@ -84,7 +84,7 @@ public class IllinoisPOSHandlerTest {
 		String[] posTags = {"NNP", "VBD", "``", "UH", "''", "."};
 		int index = 0;
 		for (Span tag : labeling.getLabels()) {
-			System.out.println(text.subSequence(tag.getStart(), tag.getEnd())+ "\t"+tag.getLabel());
+			System.out.println(text.subSequence(tag.getStart(), tag.getEnding())+ "\t"+tag.getLabel());
 			assertEquals(posTags[index], tag.getLabel());
 			index++;
 		}

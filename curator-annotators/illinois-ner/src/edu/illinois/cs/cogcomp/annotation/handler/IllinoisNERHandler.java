@@ -207,7 +207,7 @@ public class IllinoisNERHandler implements Labeler.Iface {
 							close = true;
 					}
 					if (close) {
-						span.setEnd(startend[1]);
+						span.setEnding(startend[1]);
 						location = startend[1];
 						labels.add(span);
 						open = false;

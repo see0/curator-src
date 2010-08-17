@@ -104,7 +104,7 @@ public class KBestStanfordParserHandler implements MultiParser.Iface {
 		Span span = new Span();
 		List<Word> words = parse.yield();
 		span.setStart(words.get(0).beginPosition() + offset);
-		span.setEnd(words.get(words.size() - 1).endPosition() + offset);
+		span.setEnding(words.get(words.size() - 1).endPosition() + offset);
 		node.setSpan(span);
 		return node;
 	}
@@ -120,15 +120,15 @@ public class KBestStanfordParserHandler implements MultiParser.Iface {
 			int offset = 0;
 			Object input = null;
 			String rawsent = rawText.substring(sentence.getStart(),
-					sentence.getEnd());
+					sentence.getEnding());
 			if (useTokens) {
 				List<Word> s = new ArrayList<Word>();
 				for (Span t : record.getLabelViews().get(tokensfield)
 						.getLabels()) {
 					if (t.getStart() >= sentence.getStart()
-							&& t.getEnd() <= sentence.getEnd()) {
+							&& t.getEnding() <= sentence.getEnding()) {
 						s.add(new Word(rawText.substring(t.getStart(),
-								t.getEnd()), t.getStart(), t.getEnd()));
+								t.getEnding()), t.getStart(), t.getEnding()));
 					}
 				}
 				input = s;

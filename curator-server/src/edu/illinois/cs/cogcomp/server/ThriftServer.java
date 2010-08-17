@@ -54,11 +54,9 @@ public class ThriftServer implements Runnable {
 				server = new TNonblockingServer(processor, serverTransport);
 			} else {
 				THsHaServer.Options serverOptions = new THsHaServer.Options();
-				serverOptions.minWorkerThreads = threads;
+				serverOptions.workerThreads = threads;
 				server = new THsHaServer(new TProcessorFactory(processor),
 						serverTransport, new TFramedTransport.Factory(),
-						new TFramedTransport.Factory(),
-						new TBinaryProtocol.Factory(),
 						new TBinaryProtocol.Factory(), serverOptions);
 			}
 			logger.info("Starting the server on port {} with {} threads", port,
@@ -91,8 +89,8 @@ public class ThriftServer implements Runnable {
 				.create("handler");
 		Option threads = OptionBuilder.withArgName("number of threads")
 				.hasArg()
-				.withDescription("Number of threads for server to use").create(
-						"threads");
+				.withDescription("Number of threads for server to use")
+				.create("threads");
 		Option help = new Option("help", "print this message");
 		Options options = new Options();
 		options.addOption(port);
@@ -126,8 +124,8 @@ public class ThriftServer implements Runnable {
 		try {
 			threads = Integer.parseInt(line.getOptionValue("threads", "1"));
 		} catch (NumberFormatException e) {
-			logger.warn("Couldn't interpret {} as a number.", line
-					.getOptionValue("threads"));
+			logger.warn("Couldn't interpret {} as a number.",
+					line.getOptionValue("threads"));
 		}
 		if (threads < 0) {
 			threads = 1;
@@ -138,13 +136,13 @@ public class ThriftServer implements Runnable {
 		try {
 			handlerClass = Class.forName(line.getOptionValue("handler"));
 		} catch (ClassNotFoundException e1) {
-			logger.error("Could not find handler class: {}", line
-					.getOptionValue("handler"));
+			logger.error("Could not find handler class: {}",
+					line.getOptionValue("handler"));
 			System.exit(1);
 		}
 
-		logger.info("Attempting to use {} as a handler.", handlerClass
-				.getName());
+		logger.info("Attempting to use {} as a handler.",
+				handlerClass.getName());
 
 		Class<?> ifaceInterface = handlerClass.getInterfaces()[0];
 		Class<?> serviceClass = ifaceInterface.getEnclosingClass();

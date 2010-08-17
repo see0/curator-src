@@ -116,11 +116,9 @@ public class CuratorServer {
 				server = new TNonblockingServer(processor, serverTransport);
 			} else {
 				THsHaServer.Options serverOptions = new THsHaServer.Options();
-				serverOptions.minWorkerThreads = threads;
+				serverOptions.workerThreads = threads;
 				server = new THsHaServer(new TProcessorFactory(processor),
 						serverTransport, new TFramedTransport.Factory(),
-						new TFramedTransport.Factory(),
-						new TBinaryProtocol.Factory(),
 						new TBinaryProtocol.Factory(), serverOptions);
 			}
 			Runtime.getRuntime().addShutdownHook(

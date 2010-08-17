@@ -21,7 +21,7 @@ typedef string Source
  * Span covers a portion of text.
  *
  * <code>start</code> - start index of span in the raw text (inclusive).<br/>
- * <code>end</code> - end index of span in the raw text (exclusive).<br/>
+ * <code>ending</code> - end index of span in the raw text (exclusive).<br/>
  * <code>label</code> - label for span.<br/>
  * <code>score</code> - score of span.<br/>
  * <code>source</code> - the source annotator of this span.<br/>
@@ -31,8 +31,8 @@ typedef string Source
 struct Span {
   /**  start index of span in the raw text (inclusive). */
   1: required i32 start,
-  /**  end index of span in the raw text (exclusive). */
-  2: required i32 end,
+  /**  ending index of span in the raw text (exclusive). */
+  2: required i32 ending,
   /** label for span. */  
   3: optional string label,
   /** score of span. */
@@ -151,14 +151,14 @@ struct Forest {
  * Relations are between two spans.
  *
  * <code>start</code> - the index of the span that starts this relation.<br/>
- * <code>end</code> - the index of the span that ends this relation.<br/>
+ * <code>ending</code> - the index of the span that ends this relation.<br/>
  * <code>label</code> - the label for this relation.<br/>
  * <code>source</code> - where this relation came from.<br/>
  * <code>score</code> - the score for this relation.<br/>
  */
 struct Relation {
   1: required i32 start,
-  2: required i32 end,
+  2: required i32 ending,
   3: optional string label,
   4: optional Source source,
   5: optional double score,

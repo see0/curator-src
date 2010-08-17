@@ -3,7 +3,7 @@
   <property name="curator.lib" location="${curator.dir}/lib" />
   <property name="thrift" location="." />
   <property name="thrift-gen-java" location="${thrift}/gen-java" />
-  <property name="thrift-args" value="--gen py:new_style --gen php --gen java:hashcode --gen cpp --gen perl --gen rb --gen html -r -v" />
+  <property name="thrift-args" value="--gen py:new_style --gen php --gen java:hashcode --gen cpp --gen perl --gen rb --gen html --gen csharp -r -v" />
   <property name="dist" location="dist" />
   
   <target name="resolve" description="retrieve dependencies with ivy" depends="init-ivy">

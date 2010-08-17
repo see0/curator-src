@@ -72,7 +72,7 @@ public class IllinoisPOSHandler implements Labeler.Iface {
 			Span label = new Span();
 			label.setLabel(lbjtoken.partOfSpeech);
 			label.setStart(token.getStart());
-			label.setEnd(token.getEnd());
+			label.setEnding(token.getEnding());
 			labels.add(label);
 			tcounter++;
 		}
@@ -164,13 +164,13 @@ public class IllinoisPOSHandler implements Labeler.Iface {
 		Span sentence = sentences.get(sentNum);
 		strTokens.add(new ArrayList<String>());
 		for (Span token : tokens) {
-			if (token.getStart() >= sentence.getEnd()) {
+			if (token.getStart() >= sentence.getEnding()) {
 				strTokens.add(new ArrayList<String>());
 				sentNum++;
 				sentence = sentences.get(sentNum);
 			}
 			strTokens.get(sentNum).add(
-					rawText.substring(token.getStart(), token.getEnd()));
+					rawText.substring(token.getStart(), token.getEnding()));
 		}
 		return strTokens;
 	}
