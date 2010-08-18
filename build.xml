@@ -1,4 +1,5 @@
 <project name="curator-packages" default="dist" basedir=".">
+  <property name="resources" location="resources" />
 
   <property name="dist.dir" location="dist" />  
   <property name="dist.bin" location="${dist.dir}/bin" />  
@@ -8,6 +9,10 @@
   <property name="dist.lib" location="${dist.dir}/lib" />  
   <property name="dist.doc" location="${dist.dir}/docs" />
   <property name="dist.clients" location="${dist.dir}/client-examples" />  
+
+  <property name="web.dir" location="website" />
+  <property name="web.demo" location="${web.dir}/demo" />
+  <property name="web.servers" location="${web.dir}/servers" />
 
   <macrodef name="annotator-dist">
     <attribute name="annotator" default="NOT SET"/>
@@ -31,8 +36,22 @@
     </sequential>
   </macrodef>
 
+  <macrodef name="annotator-doc">
+    <attribute name="annotator" default="NOT SET"/>
+    <sequential>
+    <exec executable="Markdown.pl" failonerror="true" dir="${dist.doc}" output="${web.servers}/README.@{annotator}.output">
+      <arg line="README.@{annotator}" />
+    </exec>
+    <exec executable="cat" failonerror="true" dir="${resources}" output="${web.servers}/README.@{annotator}.html">
+      <arg line="template.html ${web.servers}/README.@{annotator}.output footer.html" />
+    </exec>
+    <delete file="${web.servers}/README.@{annotator}.output"/>
+    </sequential>
+  </macrodef>
+
   <target name="clean">
     <delete dir="${dist.dir}" />
+    <delete dir="${web.dir}" />
     <annotator-clean annotator="illinois-tokenizer" />
     <annotator-clean annotator="illinois-pos" />
     <annotator-clean annotator="illinois-chunker" />
@@ -82,11 +101,11 @@
     <annotator-dist annotator="illinois-coref" />
     <annotator-dist annotator="stanford-parser" />
 
-    <copy file="build.dist.xml" tofile="${dist.dir}/build.xml" overwrite="true" />
-    <copy file="ivy.dist.xml" tofile="${dist.dir}/ivy.xml" overwrite="true" />
-    <copy file="logback.xml" tofile="${dist.dir}/logback.xml" overwrite="true" />
-    <copy file="INSTALL.dist" tofile="${dist.dir}/INSTALL" overwrite="true" />
-    <copy file="bootstrap.dist.sh" tofile="${dist.dir}/bootstrap.sh" overwrite="true" />
+    <copy file="${resources}/build.dist.xml" tofile="${dist.dir}/build.xml" overwrite="true" />
+    <copy file="${resources}/ivy.dist.xml" tofile="${dist.dir}/ivy.xml" overwrite="true" />
+    <copy file="${resources}/logback.xml" tofile="${dist.dir}/logback.xml" overwrite="true" />
+    <copy file="${resources}/INSTALL.dist" tofile="${dist.dir}/INSTALL" overwrite="true" />
+    <copy file="${resources}/bootstrap.dist.sh" tofile="${dist.dir}/bootstrap.sh" overwrite="true" />
     
     <copy file="lib/libthrift.jar" todir="${dist.lib}" overwrite="true" />
 
@@ -101,4 +120,33 @@
     <move file="${dist.clients}/java/README.dist" tofile="${dist.clients}/java/README" />
   </target>
 
+
+  <target name="website" depends="dist">
+    <mkdir dir="${web.dir}" />
+    <mkdir dir="${web.demo}" />
+    <mkdir dir="${web.servers}" />
+
+    <copy todir="${web.dir}/interfaces">
+      <fileset dir="curator-interfaces/gen-html" />
+    </copy>
+    <exec executable="pycco" failonerror="true" dir="curator-clients/java">
+      <arg line="CuratorDemo.java" />
+    </exec>
+    <copy file="curator-clients/java/docs/CuratorDemo.html" todir="${web.dir}" />
+    <copy file="curator-clients/java/docs/pycco.css" todir="${web.dir}" />
+    <copy file="curator-clients/java/CuratorDemo.java" todir="${web.dir}" />
+    <copy todir="${web.demo}">
+      <fileset dir="curator-clients/php" />
+    </copy>
+    <copy todir="${web.demo}/thrift/packages">
+      <fileset dir="curator-interfaces/gen-php" />
+    </copy>
+    <annotator-doc annotator="curator-server" />
+    <annotator-doc annotator="illinois-tokenizer" />
+    <annotator-doc annotator="illinois-pos" />
+    <annotator-doc annotator="illinois-chunker" />
+    <annotator-doc annotator="illinois-ner" />
+    <annotator-doc annotator="illinois-coref" />
+    <annotator-doc annotator="stanford-parser" />
+  </target>
 </project>

@@ -43,7 +43,7 @@ In order to run the server you must install the dependencies.
 Download the dependencies and move them to the curator lib directory:
 
  >     $ pwd
- >     /home/james/curato
+ >     /home/james/curator
  >     $ curl -O http://l2r.cs.uiuc.edu/~cogcomp/Software/LBJ2Library.jar
  >     $ mv LBJ2Library.jar lib
  >     $ curl -O http://l2r.cs.uiuc.edu/~cogcomp/Software/LBJPOS.jar
