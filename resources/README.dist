@@ -28,6 +28,7 @@ Annotators
 
 The Curator packages comes bundled with annotators capable of performing the
 following annotations:
+
  * Tokenization and Sentence Splitting (via Illinois NLP tools)
  * Part-of-speech tags (via Illinois POS Tagger)
  * Chunk (shallow parse) analysis (via Illinois Chunker)
