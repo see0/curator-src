@@ -14,7 +14,7 @@ require_once $GLOBALS['THRIFT_ROOT'].'/packages/curator/Curator.php';
 
 function my_substr($s, $start, $end) {
     if (function_exists('mb_substr')) {
-        return= mb_substr($s, $start, $end);
+        return mb_substr($s, $start, $end);
     } else {
         return substr($s, $start, $end);
     }
@@ -22,7 +22,7 @@ function my_substr($s, $start, $end) {
 
 function my_strlen($s) {
     if (function_exists('mb_strlen')) {
-        return= mb_strlen($s);
+        return mb_strlen($s);
     } else {
         return strlen($s);
     }
@@ -30,7 +30,7 @@ function my_strlen($s) {
 
 function my_reg_replace($pattern, $replacement, $string) {
     if (function_exists('mb_ereg_replace')) {
-        return= mb_ereg_replace($pattern, $replacement, $string);
+        return mb_ereg_replace($pattern, $replacement, $string);
     } else {
         return preg_replace($pattern, $replacment, $string);
     }

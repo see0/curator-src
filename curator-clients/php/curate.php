@@ -18,10 +18,6 @@ define('SMARTY_DIR', 'smarty/');
 
 require_once SMARTY_DIR.'Smarty.class.php';
 
-function sanitize_text($text) {
-    return str_replace(array("\r\n", "\r", "\n"), "\n", stripslashes($text));
-}
-
 function perform() {
     global $curator_hostname;
     global $curator_port;
