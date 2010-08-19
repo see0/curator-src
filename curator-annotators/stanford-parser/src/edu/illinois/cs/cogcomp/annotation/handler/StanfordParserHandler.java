@@ -48,7 +48,7 @@ public class StanfordParserHandler implements MultiParser.Iface {
 	private final Logger logger = LoggerFactory
 			.getLogger(StanfordParserHandler.class);
 	private final LexicalizedParser parser;
-	private static final String VERSION = "0.6";
+	private static final String VERSION = "0.7";
 	private String sentencesfield = "sentences";
 	private String tokensfield = "tokens";
 	private boolean useTokens = true;

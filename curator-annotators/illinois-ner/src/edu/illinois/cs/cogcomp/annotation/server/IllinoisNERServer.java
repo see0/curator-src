@@ -25,6 +25,10 @@ import org.slf4j.LoggerFactory;
 import edu.illinois.cs.cogcomp.annotation.handler.IllinoisNERHandler;
 import edu.illinois.cs.cogcomp.thrift.labeler.Labeler;
 
+/**
+ * @author James Clarke
+ * 
+ */
 public class IllinoisNERServer {
 	private static Logger logger = LoggerFactory
 			.getLogger(IllinoisNERServer.class);

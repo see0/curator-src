@@ -9,6 +9,13 @@ import edu.illinois.cs.cogcomp.thrift.base.Labeling;
 import edu.illinois.cs.cogcomp.thrift.base.Span;
 import edu.illinois.cs.cogcomp.util.StringUtil;
 
+/**
+* A simple whitespace tokenizer
+* 
+* @author James Clarke
+* 
+*/
+
 public class Whitespacer {
 
 	public static Labeling tokenize(List<String> sentences) {

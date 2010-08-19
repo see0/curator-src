@@ -26,6 +26,10 @@ import edu.illinois.cs.cogcomp.annotation.handler.KBestStanfordParserHandler;
 import edu.illinois.cs.cogcomp.annotation.handler.StanfordParserHandler;
 import edu.illinois.cs.cogcomp.thrift.parser.MultiParser;
 
+/**
+ * @author James Clarke
+ * 
+ */
 public class StanfordParserServer {
 	private static Logger logger = LoggerFactory
 			.getLogger(StanfordParserServer.class);

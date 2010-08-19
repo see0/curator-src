@@ -25,6 +25,11 @@ import org.slf4j.LoggerFactory;
 import edu.illinois.cs.cogcomp.annotation.handler.IllinoisChunkerHandler;
 import edu.illinois.cs.cogcomp.thrift.labeler.Labeler;
 
+/**
+* 
+* @author James Clarke
+* 
+*/
 public class IllinoisChunkerServer {
 	private static Logger logger = LoggerFactory
 			.getLogger(IllinoisChunkerServer.class);

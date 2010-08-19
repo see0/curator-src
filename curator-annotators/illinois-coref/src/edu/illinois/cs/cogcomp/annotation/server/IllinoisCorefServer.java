@@ -24,8 +24,12 @@ import org.slf4j.LoggerFactory;
 
 import edu.illinois.cs.cogcomp.annotation.handler.IllinoisCorefHandler;
 import edu.illinois.cs.cogcomp.thrift.cluster.ClusterGenerator;
-import edu.illinois.cs.cogcomp.thrift.labeler.Labeler;
 
+/**
+* 
+* @author James Clarke
+* 
+*/
 public class IllinoisCorefServer {
 	private static Logger logger = LoggerFactory
 			.getLogger(IllinoisCorefServer.class);

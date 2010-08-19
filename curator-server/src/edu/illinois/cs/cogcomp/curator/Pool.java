@@ -2,6 +2,11 @@ package edu.illinois.cs.cogcomp.curator;
 
 import org.apache.thrift.transport.TTransportException;
 
+/**
+* 
+* @author James Clarke
+* 
+*/
 public interface Pool {
 
 	/**

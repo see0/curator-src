@@ -19,14 +19,14 @@ function srl_to_table($record, $table, $col = 0) {
 	$start_idx = array();
 	$ends_idx = array();
 	$result = "";
-    $tokens = $record->labelViews["tokens"]
+    $tokens = $record->labelViews["tokens"];
 
 	// reverse the maps of the start and end indexes,
 	// these map to the word indices
 	foreach($tokens->labels as $i => $span) {
 		// fix the punctuation problem. (spans like ',' and '.' occupy the space before, instead of space after)
 		$ss = $span->start;
-		if($i > 0 && $tokens->labels[$i-1]->end == $span->start) {
+		if($i > 0 && $tokens->labels[$i-1]->ending == $span->start) {
 			$ss = $span->start + 1;
 		}
 		$start_idx[$ss] = $i;
@@ -44,7 +44,7 @@ function srl_to_table($record, $table, $col = 0) {
 	foreach($forest->trees as $i => $tree) {
 		$nodes = $tree->nodes;
 		$top = $nodes[$tree->top];
-        $predicatename = $top->attributes["predicate"];
+        $predicatename = $top->span->attributes["predicate"];
 		$start = $top->span->start;
 		$end = $top->span->ending;
 

@@ -25,6 +25,10 @@ import org.slf4j.LoggerFactory;
 import edu.illinois.cs.cogcomp.annotation.handler.IllinoisTokenizerHandler;
 import edu.illinois.cs.cogcomp.thrift.labeler.MultiLabeler;
 
+/**
+ * @author James Clarke
+ * 
+ */
 public class IllinoisTokenizerServer {
 
 	private static Logger logger = LoggerFactory

@@ -9,7 +9,6 @@ import org.apache.thrift.TException;
 
 import edu.illinois.cs.cogcomp.thrift.curator.MultiRecord;
 import edu.illinois.cs.cogcomp.thrift.curator.Record;
-import edu.illinois.cs.cogcomp.util.StringUtil;
 
 /**
  * Static class to create identifiers.

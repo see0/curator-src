@@ -28,11 +28,15 @@ import edu.stanford.nlp.trees.LabeledScoredTreeFactory;
 import edu.stanford.nlp.trees.TreeFactory;
 import edu.stanford.nlp.util.ScoredObject;
 
+/**
+ * @author James Clarke
+ * 
+ */
 public class KBestStanfordParserHandler implements MultiParser.Iface {
 	private final Logger logger = LoggerFactory
 			.getLogger(KBestStanfordParserHandler.class);
 	private final LexicalizedParser parser;
-	private static final String VERSION = "0.2";
+	private static final String VERSION = "0.3";
 	private String sentencesfield = "sentences";
 	private String tokensfield = "tokens";
 	private boolean useTokens = true;
