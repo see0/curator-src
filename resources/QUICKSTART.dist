@@ -1,0 +1,48 @@
+Curator Quick Start Guide
+=========================
+
+Download all the Curator and annotator dependencies and model files.
+
+ >     /home/james/curator
+ >     $ ant
+ >     $ sh bootstrap.sh
+
+Now we have everything we need to run the annotator and Curator servers.
+
+We can use one big machine to run everything (annotators and the Curator) in a
+single Java Virtual Machine (JVM).
+
+ >     $ pwd
+ >     /home/james/curator
+ >     $ sh bin/curator-local.sh --port 9090 --threads 10 --annotators configs/annotators-local.xml
+
+However usually you will want to run annotation servers on separate machines and
+in different JVMs.
+
+Load annotation servers on one or more machines.
+
+ >     $ pwd
+ >     /home/james/curator
+ >     $ sh bin/illinois-pos-server.sh --port 9091 &
+ >     $ sh bin/illinois-chunk-server.sh --port 9092 &
+ >     $ sh bin/illinois-ner-server.sh --port 9093 &
+ >     $ sh bin/illinois-coref-server.sh --port 9094 &
+ >     $ sh bin/stanford-parser-server.sh --port 9095 &
+
+
+Now configure and run the Curator.
+
+ >     $ pwd
+ >     /home/james/curator
+ >     $ cp configs/annotators-example.xml configs/annotators.xml
+ >     $ emacs annotators.xml
+ >     change the host fields to correspond to the servers you loaded
+ >     $ sh bin/curator.sh --port 9090 --threads 10 --annotators configs/annotators.xml
+
+The Curator is now running.  Let's attempt to connect a simple client.
+
+ >     $ pwd
+ >     /home/james/curator
+ >     $ cd client-examples/java
+ >     $ ant
+ >     $ sh runclient.sh curatorhostname 9090
