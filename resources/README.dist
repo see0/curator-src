@@ -10,13 +10,16 @@ the requests annotations for natural language text.
 Interfaces
 ----------
 
-The Curator defines multiple data types and service interfaces for creating new
-annotation servers and communicating with the Curator.  The interfaces are
-defined using [Apache Thrift][thrift] which provides a software stack and code
-generation for cross-language deployment. This allows annotation servers and
-Curator clients to be written in multiple language.  Currently Thrift supports
-C++, Java, Python, PHP, Ruby, Erlang, Perl, Haskell, C#, Cocoa, Smalltalk, and
-OCaml.
+The Curator architecture defines multiple data types and service interfaces for
+creating new annotation servers and communicating with the Curator.  The
+interfaces are defined using [Apache Thrift][thrift] which provides a software
+stack and code generation for cross-language deployment. This allows annotation
+servers and Curator clients to be written in multiple language.  Currently
+Thrift supports C++, Java, Python, PHP, Ruby, Erlang, Perl, Haskell, C#, Cocoa,
+Smalltalk, and OCaml.
+
+`docs/interfaces` describe the interfaces and data structures used within the
+Curator architecture.
 
 [thrift]: http://incubator.apache.org/thrift/
 
