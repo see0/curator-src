@@ -186,10 +186,10 @@ public class CuratorDemo {
         
         // Now we have the data structure to pass to the Curator we will open a
         // transport and the make the call like before.  This time we will
-        // request the quantities annotation.
+        // request the chunker (shallow parse) annotation.
         try {
             transport.open();
-            record = client.wsprovide("quantities", sentences, false);
+            record = client.wsprovide("chunk", sentences, false);
             transport.close();
         } catch (ServiceUnavailableException e) {
         	if (transport.isOpen())
@@ -209,14 +209,34 @@ public class CuratorDemo {
         //before, however the field `whitespaced` will now be `true`.
         //Iterating over the annotations should produce:
         //
-        // > NUMBER : $ 130  
-        // > NUMBER : 16 percent premium  
-        // > NUMBER : Monday   
-        // > NUMBER : 28 percent  
-        // > NUMBER : $ 143.17
+        // > NP : BHP Billiton   
+        // > VP : based   
+        // > PP : in  
+        // > NP : Australia  
+        // > VP : is offering   
+        // > NP : $ 130   
+        // > PP : for   
+        // > NP : each share   
+        // > PP : of   
+        // > NP : Potash   
+        // > NP : a 16 percent premium   
+        // > PP : to   
+        // > NP : its closing price   
+        // > NP : Monday   
+        // > NP : Potash   
+        // > NP : 's shares   
+        // > NP : which   
+        // > VP : trade   
+        // > AD :VP mainly   
+        // > PP : on   
+        // > NP : the New York Stock Exchange   
+        // > VP : surged   
+        // > NP : 28 percent   
+        // > PP : to   
+        // > NP : $ 143.17  
         boolean whitespaced = record.isWhitespaced();
 
-        for (Span span : record.getLabelViews().get("quantities").getLabels()) {
+        for (Span span : record.getLabelViews().get("chunk").getLabels()) {
             System.out.println(span.getLabel() + " : "
                     + text.substring(span.getStart(), span.getEnding()));
         }
