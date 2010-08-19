@@ -16,14 +16,16 @@ require_once $GLOBALS['THRIFT_ROOT'].'/packages/parser/Parser.php';
 require_once $GLOBALS['THRIFT_ROOT'].'/packages/parser/MultiParser.php';
 require_once $GLOBALS['THRIFT_ROOT'].'/packages/curator/Curator.php';
 
-require_once 'helperfunctions.php';
-require_once 'CURATORCONFIG.php';
+require_once 'lib/helperfunctions.php';
+require_once('lib/CURATORCONFIG.php');
 
 define('SMARTY_DIR', 'smarty/');
 
 require_once SMARTY_DIR.'Smarty.class.php';
 
 function perform() {
+    global $curator_hostname;
+    global $curator_port;
     $smarty = new Smarty;
     $text = stripslashes($_POST["text"]);
     $store = true;
@@ -134,6 +136,14 @@ function perform() {
         $smarty->assign('jquery', $javascript);
         $smarty->assign('content', $resulthtml);
         $smarty->display('result.tpl');
+    } catch (base_AnnotationFailedException $af) {
+        if ($transport->isOpen()) {
+            $transport->close();
+        }
+        echo "<p><code>Annotation failed: $af->reason</p>";
+        echo "<code><pre>";
+        echo $af;
+        echo "</pre></code>";
     } catch (TException $tx) {
         if ($transport->isOpen()) {
             $transport->close();

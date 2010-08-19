@@ -42,7 +42,7 @@
     <exec executable="Markdown.pl" failonerror="true" dir="${dist.doc}" output="${web.servers}/README.@{annotator}.output">
       <arg line="README.@{annotator}" />
     </exec>
-    <exec executable="cat" failonerror="true" dir="${resources}" output="${web.servers}/README.@{annotator}.html">
+    <exec executable="cat" failonerror="true" dir="${resources}" output="${web.servers}/@{annotator}.README.html">
       <arg line="template.html ${web.servers}/README.@{annotator}.output footer.html" />
     </exec>
     <delete file="${web.servers}/README.@{annotator}.output"/>

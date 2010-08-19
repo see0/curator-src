@@ -128,7 +128,7 @@ public class CuratorDemo {
         // [l]: interfaces/base.html#Struct_Labeling
         // [c]: interfaces/base.html#Struct_Clustering
         // [f]: interfaces/base.html#Struct_Forest
-        // [r]: interfaces/base.html#Struct_Record
+        // [r]: interfaces/curator.html#Struct_Record
         // [readme]: servers/
         //
         // 
@@ -157,7 +157,7 @@ public class CuratorDemo {
                     + text.substring(span.getStart(), span.getEnding()));
         }
 
-        //**Using pretokenized text**
+        //**Using pretokenized text**  
         // Often corpora come pre-tokenized. Running a tokenizer over
         // pre-tokenized text can lead to really bad tokenization. The Curator
         // has additional methods that are designed for pretokenized text.

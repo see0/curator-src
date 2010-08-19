@@ -11,10 +11,16 @@ require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
 
 require_once $GLOBALS['THRIFT_ROOT'].'/packages/curator/Curator.php';
 
+require_once "lib/CURATORCONFIG.php";
+
 function perform() {
+    global $curator_hostname;
+    global $curator_port;
     try {
+        $hostname = $curator_hostname;
+        $port = $curator_port;
         $timeout = 300;
-        $socket = new TSocket('grandpa.cs.uiuc.edu', 9010);
+        $socket = new TSocket($hostname, $port);
         $socket->setRecvTimeout($timeout*1000);
         $transport = new TBufferedTransport($socket, 1024, 1024);
         $transport = new TFramedTransport($transport);

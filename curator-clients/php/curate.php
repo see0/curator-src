@@ -11,8 +11,8 @@ require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
 
 require_once $GLOBALS['THRIFT_ROOT'].'/packages/curator/Curator.php';
 
-require_once 'helperfunctions.php';
-require_once 'CURATORCONFIG.php';
+require_once 'lib/helperfunctions.php';
+require_once 'lib/CURATORCONFIG.php';
 
 define('SMARTY_DIR', 'smarty/');
 
@@ -23,6 +23,8 @@ function sanitize_text($text) {
 }
 
 function perform() {
+    global $curator_hostname;
+    global $curator_port;
     $smarty = new Smarty;
 
     $text = sanitize_text($_POST["text"]);
