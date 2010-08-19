@@ -541,6 +541,9 @@ public class CuratorHandler implements Curator.Iface {
 	}
 	
 	private void cascadeRemoveStaleFields(String view_name, Record record, Map<String, ?> views) {
+		if (!invertedRequirements.containsKey(view_name)) {
+			return;
+		}
 		for (String dependent : invertedRequirements.get(view_name)) {
 			if (views.containsKey(dependent)) {
 				logger.debug("Removing {} annotation because it depends on {}", dependent, view_name);
