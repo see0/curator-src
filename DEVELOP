@@ -5,13 +5,13 @@ First download all the dependencies and data files that are unavailable via
 maven repos using the `boostrap.sh` script:
 
  >     $ pwd
- >     /home/james/curator
+ >     /home/james/curator-src
  >     $ sh bootstrap.sh
 
 You should now be able to build everything using ant.
 
  >     $ pwd
- >     /home/james/curator
+ >     /home/james/curator-src
  >     $ ant dist
 
 This will create a `dist` directory which contains all the jars, scripts and
