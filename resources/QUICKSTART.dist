@@ -39,10 +39,21 @@ Now configure and run the Curator.
  >     change the host fields to correspond to the servers you loaded
  >     $ sh bin/curator.sh --port 9090 --threads 10 --annotators configs/annotators.xml
 
-The Curator is now running.  Let's attempt to connect a simple client.
+The Curator is now running.  Let us attempt to connect a simple client.
 
  >     $ pwd
  >     /home/james/curator
  >     $ cd client-examples/java
  >     $ ant
  >     $ sh runclient.sh curatorhostname 9090
+
+We can now shutdown the annotators by sending a kill signal (^C or kill PID).
+This will cause the servers to gracefully quit.
+
+To learn more about the Curator server and annotation servers check the README
+files in `docs`.
+
+If you are interested in using the Curator as a user we recommend you read
+[CuratorDemo.java][1] in `client-examples/java`.
+
+[1]: http://cogcomp.cs.illinois.edu/curator/CuratorDemo.html

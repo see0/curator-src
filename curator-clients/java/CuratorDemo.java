@@ -91,8 +91,8 @@ public class CuratorDemo {
             // 3. `boolean` representing whether the annotation should be
             // reprocessed regardless of the cache.
             //
-            //[capi]: http://l2r.cs.uiuc.edu/~cogcomp/newcurator/docs/curator.html#Svc_Curator
-            //[status]: http://l2r.cs.uiuc.edu/~cogcomp/newcurator/status.php
+            //[capi]: interfaces/curator.html#Svc_Curator
+            //[status]: demo/status.php
             record = client.provide("ner", text, false);
             // Don't forget to close the transport once you have finished using
             //the Curator.

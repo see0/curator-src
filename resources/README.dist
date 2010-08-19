@@ -1,0 +1,51 @@
+The Curator
+===========
+
+The Curator is a system that acts as a central server in providing annotations
+for text.  It is responsible for requesting annotations from multiple natural
+language processing servers, caching and storing previous annotations and
+refreshing stale annotations.  The Curator provides a centralized resource which
+the requests annotations for natural language text.
+
+Interfaces
+----------
+
+The Curator defines multiple data types and service interfaces for creating new
+annotation servers and communicating with the Curator.  The interfaces are
+defined using [Apache Thrift][thrift] which provides a software stack and code
+generation for cross-language deployment. This allows annotation servers and
+Curator clients to be written in multiple language.  Currently Thrift supports
+C++, Java, Python, PHP, Ruby, Erlang, Perl, Haskell, C#, Cocoa, Smalltalk, and
+OCaml.
+
+[thrift]: http://incubator.apache.org/thrift/
+
+Annotators
+----------
+
+The Curator packages comes bundled with annotators capable of performing the
+following annotations:
+ * Tokenization and Sentence Splitting (via Illinois NLP tools)
+ * Part-of-speech tags (via Illinois POS Tagger)
+ * Chunk (shallow parse) analysis (via Illinois Chunker)
+ * Named Entities (via Illinois Named Entity Recognizer)
+ * Coreference (via Illinois Coreference package)
+ * Parse trees (via Stanford Parser)
+ * Dependency trees (via Stanford Parser)
+
+
+Installation and Running
+------------------------
+
+See the INSTALL and QUICKSTART for getting started.
+
+Learn more
+----------
+
+To learn more about the Curator server and annotation servers check the README
+files in `docs`.
+
+If you are interested in using the Curator as a user we recommend you read
+[CuratorDemo.java][1] in `client-examples/java`.
+
+[1]: http://cogcomp.cs.illinois.edu/curator/CuratorDemo.html

@@ -25,6 +25,11 @@ import org.slf4j.LoggerFactory;
 import edu.illinois.cs.cogcomp.curator.CuratorHandler;
 import edu.illinois.cs.cogcomp.thrift.curator.Curator;
 
+/**
+* 
+* @author James Clarke
+* 
+*/
 public class CuratorServer {
 	private static Logger logger = LoggerFactory.getLogger(CuratorServer.class);
 

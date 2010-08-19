@@ -114,6 +114,7 @@
     <copy file="${resources}/logback.xml" tofile="${dist.dir}/logback.xml" overwrite="true" />
     <copy file="${resources}/INSTALL.dist" tofile="${dist.dir}/INSTALL" overwrite="true" />
     <copy file="${resources}/QUICKSTART.dist" tofile="${dist.dir}/QUICKSTART" overwrite="true" />
+    <copy file="${resources}/README.dist" tofile="${dist.dir}/README" overwrite="true" />
     <copy file="${resources}/bootstrap.dist.sh" tofile="${dist.dir}/bootstrap.sh" overwrite="true" />
     
     <copy file="lib/libthrift.jar" todir="${dist.lib}" overwrite="true" />
@@ -147,6 +148,7 @@
 
     <md-doc infile="${dist.dir}/INSTALL" outfile="${web.dir}/INSTALL.html"/>
     <md-doc infile="${dist.dir}/QUICKSTART" outfile="${web.dir}/QUICKSTART.html"/>
+    <md-doc infile="${dist.dir}/README" outfile="${web.dir}/README.html"/>
 
     <copy todir="${web.demo}">
       <fileset dir="curator-clients/php" />
