@@ -24,6 +24,8 @@
 //
 // [status]: demo/status.php
 // [demo]: demo/
+import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 
 import org.apache.thrift.TException;
@@ -70,7 +72,7 @@ public class CuratorDemo {
             + "his frustration in his opening remarks. \"The world's glaciers are "
             + "now melting faster than human progress to protect them -- or us,\" he "
             + "said. Others shared his gloom. \"Today we are on a path to failure,"
-            + "\" said France's Nicolas Sarkozy."
+            + "\" said France's Nicolas Sarkozy.";
 
         //Now we are going to make the call to the Curator.  We must first open
         //the transport and then make the call to the Curator.
@@ -82,7 +84,7 @@ public class CuratorDemo {
             //method which takes three arguments:
             //
             // 1. `view_name` represented as a String. (e.g., `pos`, `ner`,
-            // `srl` etc). For a list of the avaiable view names call
+            // `srl` etc). For a list of the available view names call
             // `describeAnnotations()` or check the [status page][status].
             // 2. `text` the text you want to process.  This can contain
             // multiple sentences and new lines.
@@ -121,7 +123,7 @@ public class CuratorDemo {
         // `parseViews`. `record.getParseViews()` returns a `Map<String,
         // Forest>`.
         //
-        //The semantics of each datastructures depends on the producing
+        //The semantics of each data structure depends on the producing
         //annotator. The [README files][readme] files for each server should
         //contain a description of the semantics.
         //
@@ -142,10 +144,10 @@ public class CuratorDemo {
         // printing out the detected entities and their label. [Span][span]s
         // contain multiple fields but the most important fields are the `start`
         // and `ending` fields which refer to the position the span covers in
-        // the record's `rawText` field. See the [Span defintion][span] for more
+        // the record's `rawText` field. See the [Span definition][span] for more
         // information.
         //
-        // The outpout of this loop should be:
+        // The output of this loop should be:
         // > LOC : Copenhagen  
         // > ORG : UN  
         // > PER : Ban Ki-Moon  
@@ -181,7 +183,7 @@ public class CuratorDemo {
         // request the quantities annotation.
         try {
             transport.open();
-            record = client.wsprovide("quantities", text, false);
+            record = client.wsprovide("quantities", sentences, false);
             transport.close();
         } catch (ServiceUnavailableException e) {
             e.printStackTrace();

@@ -7,10 +7,10 @@
 </appender>
 
 <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-  <file>logs/${HOSTNAME:-unknown}-servers.log</file>
+  <file>logs/${HOSTNAME}-servers.log</file>
   <prudent>true</prudent>
   <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-    <FileNamePattern>logs/dated/${HOSTNAME:-unknown}-servers.%d{yyyy-MM-dd}.log</FileNamePattern>
+    <FileNamePattern>logs/dated/${HOSTNAME}-servers.%d{yyyy-MM-dd}.log</FileNamePattern>
     <MaxHistory>10</MaxHistory>
   </rollingPolicy>
   

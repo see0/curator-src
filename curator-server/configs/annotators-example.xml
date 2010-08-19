@@ -11,7 +11,7 @@
 <annotator>
   <type>labeler</type>
   <field>pos</field>
-  <host>somehost:9081</host>
+  <host>poshost:9091</host>
   <requirement>sentences</requirement>
   <requirement>tokens</requirement>
 </annotator>
@@ -19,7 +19,7 @@
 <annotator>
   <type>labeler</type>
   <field>chunk</field>
-  <host>anotherhost:9085</host>
+  <host>chunkhost:9092</host>
   <requirement>sentences</requirement>
   <requirement>tokens</requirement>
   <requirement>pos</requirement>
@@ -28,22 +28,13 @@
 <annotator>
   <type>labeler</type>
   <field>ner</field>
-  <host>nerhost:9082</host>
-</annotator>
-
-<annotator>
-  <type>labeler</type>
-  <field>quantities</field>
-  <host>hostname:9087</host>
-  <requirement>sentences</requirement>
-  <requirement>tokens</requirement>
-  <requirement>pos</requirement>
+  <host>nerhost:9093</host>
 </annotator>
 
 <annotator>
   <type>clustergenerator</type>
   <field>coref</field>
-  <host>hostname</host>
+  <host>corefhost:9094</host>
   <requirement>sentences</requirement>
   <requirement>tokens</requirement>
   <requirement>pos</requirement>
@@ -51,19 +42,10 @@
 </annotator>
 
 <annotator>
-  <type>parser</type>
-  <field>charniak</field>
-  <host>hostname:4457</host>
-  <host>anotherhost:4457</host>
-  <requirement>sentences</requirement>
-  <requirement>tokens</requirement>
-</annotator>
-
-<annotator>
   <type>multiparser</type>
   <field>stanfordParse</field>
   <field>stanfordDep</field>
-  <host>hostname:8843</host>
+  <host>stanfordhost:9095</host>
   <requirement>sentences</requirement>
   <requirement>tokens</requirement>
 </annotator>

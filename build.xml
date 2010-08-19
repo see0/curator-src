@@ -39,13 +39,21 @@
   <macrodef name="annotator-doc">
     <attribute name="annotator" default="NOT SET"/>
     <sequential>
-    <exec executable="Markdown.pl" failonerror="true" dir="${dist.doc}" output="${web.servers}/README.@{annotator}.output">
-      <arg line="README.@{annotator}" />
+      <md-doc infile="${dist.doc}/README.@{annotator}" outfile="${web.servers}/README.@{annotator}.html" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="md-doc">
+    <attribute name="infile" default="NOT SET"/>
+    <attribute name="outfile" default="NOT SET"/>
+    <sequential>
+    <exec executable="Markdown.pl" failonerror="true" dir="${basedir}" output="@{outfile}.output">
+      <arg line="@{infile}" />
     </exec>
-    <exec executable="cat" failonerror="true" dir="${resources}" output="${web.servers}/@{annotator}.README.html">
-      <arg line="template.html ${web.servers}/README.@{annotator}.output footer.html" />
+    <exec executable="cat" failonerror="true" dir="${resources}" output="@{outfile}">
+      <arg line="template.html @{outfile}.output footer.html" />
     </exec>
-    <delete file="${web.servers}/README.@{annotator}.output"/>
+    <delete file="@{outfile}.output"/>
     </sequential>
   </macrodef>
 
@@ -105,6 +113,7 @@
     <copy file="${resources}/ivy.dist.xml" tofile="${dist.dir}/ivy.xml" overwrite="true" />
     <copy file="${resources}/logback.xml" tofile="${dist.dir}/logback.xml" overwrite="true" />
     <copy file="${resources}/INSTALL.dist" tofile="${dist.dir}/INSTALL" overwrite="true" />
+    <copy file="${resources}/QUICKSTART.dist" tofile="${dist.dir}/QUICKSTART" overwrite="true" />
     <copy file="${resources}/bootstrap.dist.sh" tofile="${dist.dir}/bootstrap.sh" overwrite="true" />
     
     <copy file="lib/libthrift.jar" todir="${dist.lib}" overwrite="true" />
@@ -135,6 +144,10 @@
     <copy file="curator-clients/java/docs/CuratorDemo.html" todir="${web.dir}" />
     <copy file="curator-clients/java/docs/pycco.css" todir="${web.dir}" />
     <copy file="curator-clients/java/CuratorDemo.java" todir="${web.dir}" />
+
+    <md-doc infile="${dist.dir}/INSTALL" outfile="${web.dir}/INSTALL.html"/>
+    <md-doc infile="${dist.dir}/QUICKSTART" outfile="${web.dir}/QUICKSTART.html"/>
+
     <copy todir="${web.demo}">
       <fileset dir="curator-clients/php" />
     </copy>

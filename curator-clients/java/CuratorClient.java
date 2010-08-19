@@ -85,34 +85,37 @@ public class CuratorClient {
 
 		System.out.println();
 		
-		
-		System.out.println("First we'll get the named entities in the text.");
-		System.out.print("Calling curator.provide(\"ner\", text, false)... ");
-		Record record = null;
-		try {
-			transport.open();
-			//call Curator
-			record = client.provide("ner", text, false);
-			transport.close();
-		} catch (ServiceUnavailableException e) {
-			e.printStackTrace();
-		} catch (TException e) {
-			e.printStackTrace();
-		}
+        System.out.println("First we'll get the named entities in the text.");
+        System.out.print("Calling curator.provide(\"ner\", text, false)... ");
+        Record record = null;
+        try {
+            transport.open();
+            //call Curator
+            record = client.provide("ner", text, false);
+            transport.close();
+        } catch (ServiceUnavailableException e) {
+            System.out.println("ner annotations are not available");
+            System.out.println(e.getReason());
+             
+        } catch (TException e) {
+            e.printStackTrace();
+        }
 		System.out.println("done.\n");
 		System.out.println();
 		System.out.println(recordContents(record));
 		System.out.println();
-        System.out.println("Named Entities\n---------\n");
-		for (Span span : record.getLabelViews().get("ner").getLabels()) {
-			System.out.println(span.getLabel() + " : "
-					+ record.getRawText().substring(span.getStart(), span.getEnding()));
-		}
-		System.out.println();
-		System.out.println();
-		System.out.println("The raw data structure containing the NEs looks like this:");
-		System.out.println(record.getLabelViews().get("ner"));
-		System.out.println();
+        if (avail.containsKey("ner")) {
+            System.out.println("Named Entities\n---------\n");
+            for (Span span : record.getLabelViews().get("ner").getLabels()) {
+                System.out.println(span.getLabel() + " : "
+                + record.getRawText().substring(span.getStart(), span.getEnding()));
+            }
+            System.out.println();
+            System.out.println();
+            System.out.println("The raw data structure containing the NEs looks like this:");
+            System.out.println(record.getLabelViews().get("ner"));
+        }
+        System.out.println();
 		System.out.println("Next we will get a chunking (shallow parse) of the text.");
 		System.out.print("Calling curator.provide(\"chunk\", text, false)... ");
 		try {

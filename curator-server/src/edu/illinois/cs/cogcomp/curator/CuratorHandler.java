@@ -58,7 +58,9 @@ import edu.illinois.cs.cogcomp.util.StringUtil;
 public class CuratorHandler implements Curator.Iface {
 
 	private final Logger logger = LoggerFactory.getLogger(CuratorHandler.class);
-
+	private final String SHORTNAME = "curator";
+	private final String VERSION = "0.6";
+	
 	private final int CLIENTTIMEOUT;
 
 	private final Map<String, AtomicInteger> counters = new HashMap<String, AtomicInteger>();
@@ -402,11 +404,11 @@ public class CuratorHandler implements Curator.Iface {
 	}
 
 	public String getVersion() throws TException {
-		return "0.6";
+		return VERSION;
 	}
 
 	public String getSourceIdentifier() throws TException {
-		return "curator-" + getVersion();
+		return SHORTNAME + getVersion();
 	}
 
 	private Record getRecord(String text, boolean whitespaced)
@@ -1009,11 +1011,5 @@ public class CuratorHandler implements Curator.Iface {
 	public Record getRecord(String text) throws ServiceUnavailableException,
 			AnnotationFailedException, TException {
 		return getRecord(text, false);
-	}
-
-	public static void main(String args[]) {
-		String text = "This is an example sentence.";
-		Curator.Iface handler = new CuratorHandler(
-				"configs/curator.properties", "configs/annotators-simple.xml");
 	}
 }

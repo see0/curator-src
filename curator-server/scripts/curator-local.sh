@@ -14,6 +14,6 @@ LIB_CLASSPATH=$LIBDIR/LBJ2Library.jar:$LIBDIR/LBJChunk.jar:$LIBDIR/LBJCoref.jar:
 CLASSPATH=$COMPONENT_CLASSPATH:$LIB_CLASSPATH
 
 cd $CURATOR_BASE
-echo java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx4000m edu.illinois.cs.cogcomp.curator.CuratorServer --config configs/curator.properties --annotators configs/annotators-local.xml $@
-java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx4000m edu.illinois.cs.cogcomp.curator.CuratorServer --config configs/curator.properties --annotators configs/annotators-local.xml $@
+echo java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx4000m edu.illinois.cs.cogcomp.curator.CuratorServer $@
+java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx4000m edu.illinois.cs.cogcomp.curator.CuratorServer $@
 cd $START
