@@ -1,5 +1,5 @@
 <?php
-$GLOBALS['THRIFT_ROOT'] = 'thrift';
+$GLOBALS['THRIFT_ROOT'] = dirname(__FILE__).'/../thrift';
 require_once $GLOBALS['THRIFT_ROOT'].'/Thrift.php';
 require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
 require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
@@ -12,11 +12,14 @@ require_once $GLOBALS['THRIFT_ROOT'].'/packages/curator/Curator.php';
 // the mb version if available.
 // Note str_replace is multi-byte safe so we don't need a my_ version.
 
-function my_substr($s, $start, $end) {
+function my_substr($s, $start, $length="x") {
+    if ($length == "x") {
+        $length = my_strlen($s) - $start;
+    }
     if (function_exists('mb_substr')) {
-        return mb_substr($s, $start, $end);
+        return mb_substr($s, $start, $length);
     } else {
-        return substr($s, $start, $end);
+        return substr($s, $start, $length);
     }
 }
 
@@ -60,7 +63,7 @@ function build_array($labels) {
         if (!isset($result[$span->start])) {
             $result[$span->start] = array();
         }
-        $result[$span->start][$span->end] = $span;
+        $result[$span->start][$span->ending] = $span;
     }
     return $result;
 }
@@ -226,10 +229,10 @@ function getHTMLForLabels($record, $labeling) {
     $j = 0;
     $result = '<div class="output"><p><span class="sentence">';
     foreach ($labels as $start => $ends) {
-        if ($start > $sents[$j]->end) {
-            if ($previous < $sents[$j]->end) {
-                $result .= htmlspecialchars(my_substr($rawtext, $previous, $sents[$j]->end - $previous));
-                $previous = $sents[$j]->end;
+        if ($start > $sents[$j]->ending) {
+            if ($previous < $sents[$j]->ending) {
+                $result .= htmlspecialchars(my_substr($rawtext, $previous, $sents[$j]->ending - $previous));
+                $previous = $sents[$j]->ending;
             }
             $result .= '</span><span class="sentence">';
             $j = $j + 1;

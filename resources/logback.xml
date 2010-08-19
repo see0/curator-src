@@ -19,7 +19,7 @@
   </layout>
 </appender>
 
-<root level="${loggerlevel:-DEBUG}">
+<root level="${loggerlevel:-INFO}">
   <appender-ref ref="STDOUT" />
   <appender-ref ref="FILE" />
 </root>

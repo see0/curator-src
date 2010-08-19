@@ -7,7 +7,7 @@ CURATOR_BASE=`cd "$CURATOR_BASE" > /dev/null && pwd`
 LIBDIR=$CURATOR_BASE/lib
 COMPONENTDIR=$CURATOR_BASE/components
 
-COMPONENT_CLASSPATH=$COMPONENTDIR/illinois-ner-server.jar:$COMPONENTDIR/curator-interfaces.jar
+COMPONENT_CLASSPATH=$CURATOR_BASE:$COMPONENTDIR/illinois-ner-server.jar:$COMPONENTDIR/curator-interfaces.jar
 
 # ner has a dependency on an older LBJ2Library (2.2.2)
 

@@ -125,7 +125,7 @@ public class IllinoisNERHandler implements Labeler.Iface {
 
 		long endTime = System.currentTimeMillis();
 		long time = endTime - startTime;
-		logger.debug("Performed NER in {}ms", time);
+		logger.info("Performed NER in {}ms", time);
 		return data;
 	}
 
@@ -303,7 +303,7 @@ public class IllinoisNERHandler implements Labeler.Iface {
 	}
 
 	public boolean ping() {
-		logger.debug("PONG!");
+		logger.info("PONG!");
 		return true;
 	}
 

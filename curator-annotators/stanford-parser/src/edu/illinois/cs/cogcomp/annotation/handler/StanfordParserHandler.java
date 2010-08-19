@@ -164,7 +164,7 @@ public class StanfordParserHandler implements MultiParser.Iface {
 		edu.stanford.nlp.trees.Tree result = (edu.stanford.nlp.trees.Tree) parser
 				.apply(text);
 		long endTime = System.currentTimeMillis();
-		logger.debug("Parsed input in {}ms", endTime - startTime);
+		logger.info("Parsed input in {}ms", endTime - startTime);
 		return result;
 	}
 

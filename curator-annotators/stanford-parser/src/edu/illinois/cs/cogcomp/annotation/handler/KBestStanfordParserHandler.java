@@ -175,7 +175,7 @@ public class KBestStanfordParserHandler implements MultiParser.Iface {
 		}
 		if (parsed) {
 			long endTime = System.currentTimeMillis();
-			logger.debug("Parsed input in {}ms", endTime - startTime);
+			logger.info("Parsed input in {}ms", endTime - startTime);
 			return parser.getKBestPCFGParses(k);
 		}
 		// if can't parse or exception, fall through

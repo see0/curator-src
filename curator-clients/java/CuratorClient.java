@@ -94,17 +94,22 @@ public class CuratorClient {
             record = client.provide("ner", text, false);
             transport.close();
         } catch (ServiceUnavailableException e) {
+        	if (transport.isOpen())
+        		transport.close();
             System.out.println("ner annotations are not available");
             System.out.println(e.getReason());
              
         } catch (TException e) {
+        	if (transport.isOpen())
+        		transport.close();
             e.printStackTrace();
         }
 		System.out.println("done.\n");
 		System.out.println();
-		System.out.println(recordContents(record));
-		System.out.println();
         if (avail.containsKey("ner")) {
+        	System.out.println(recordContents(record));
+        	System.out.println();
+
             System.out.println("Named Entities\n---------\n");
             for (Span span : record.getLabelViews().get("ner").getLabels()) {
                 System.out.println(span.getLabel() + " : "

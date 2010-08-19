@@ -74,19 +74,19 @@ public class IllinoisCorefHandler implements ClusterGenerator.Iface {
 	}
 
 	private void loadCorefSystem() {
-		logger.debug("Loading classifier");
+		logger.info("Loading classifier");
 		corefClassifier = new Emnlp8();
 		corefClassifier.setThreshold(-8.0);
-		logger.debug("Loading decoder");
+		logger.info("Loading decoder");
 		decoder = new BestLinkDecoder(corefClassifier);
-		logger.debug("Loading mention decoder");
+		logger.info("Loading mention decoder");
 		mDec = new ExtendHeadsDecoder(new MDExtendHeads(), new BIODecoder(
 				new MentionDetectorMyBIOHead()));
-		logger.debug("Loading mention typer");
+		logger.info("Loading mention typer");
 		mTyper = new MTypePredictor();
-		logger.debug("Loading document loader");
+		logger.info("Loading document loader");
 		loader = new DocFromTextLoader(mDec, mTyper);
-		logger.debug("Components loaded.");
+		logger.info("Components loaded.");
 	}
 
 	public boolean ping() throws TException {
@@ -151,7 +151,7 @@ public class IllinoisCorefHandler implements ClusterGenerator.Iface {
 		result.setClusters(clusters);
 		long endTime = System.currentTimeMillis();
 		long time = endTime - startTime;
-		logger.debug("Performed Coref in {}ms", time);
+		logger.info("Performed Coref in {}ms", time);
 		return result;
 	}
 

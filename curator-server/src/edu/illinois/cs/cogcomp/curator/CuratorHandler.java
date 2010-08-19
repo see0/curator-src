@@ -177,7 +177,7 @@ public class CuratorHandler implements Curator.Iface {
 					if (requirements.length > 0) {
 						// store requirements
 						this.requirements.put(field,Arrays.asList(requirements));
-						logger.debug(field + " requires "
+						logger.info(field + " requires "
 								+ this.requirements.get(field));
 						for (String dependency : this.requirements.get(field)) {
 							if (!invertedRequirements.containsKey(dependency)) {
@@ -584,7 +584,7 @@ public class CuratorHandler implements Curator.Iface {
 
 			// we need to check we can provide this annotation
 			if (!pools.containsKey(view_name)) {
-				logger.debug("Couldn't find an annotator for {}", view_name);
+				logger.info("Couldn't find an annotator for {}", view_name);
 				throw new ServiceUnavailableException(
 						"The Curator does not know of any annotators for "
 								+ view_name

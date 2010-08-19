@@ -79,7 +79,7 @@ public class IllinoisPOSHandler implements Labeler.Iface {
 		labeling.setLabels(labels);
 		labeling.setSource(getSourceIdentifier());
 		long endTime = System.currentTimeMillis();
-		logger.debug("Tagged input in {}ms", endTime-startTime);
+		logger.info("Tagged input in {}ms", endTime-startTime);
 		return labeling;
 	}
 

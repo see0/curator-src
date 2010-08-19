@@ -98,10 +98,16 @@ public class CuratorDemo {
             //the Curator.
             transport.close();
         } catch (ServiceUnavailableException e) {
+        	if (transport.isOpen())
+        		transport.close();
             e.printStackTrace();
         } catch (AnnotationFailedException e) {
+        	if (transport.isOpen())
+        		transport.close();
             e.printStackTrace();
         } catch (TException e) {
+        	if (transport.isOpen())
+        		transport.close();
             e.printStackTrace();
         }
 
@@ -186,10 +192,16 @@ public class CuratorDemo {
             record = client.wsprovide("quantities", sentences, false);
             transport.close();
         } catch (ServiceUnavailableException e) {
+        	if (transport.isOpen())
+        		transport.close();
             e.printStackTrace();
         } catch (AnnotationFailedException e) {
+        	if (transport.isOpen())
+        		transport.close();
             e.printStackTrace();
         } catch (TException e) {
+        	if (transport.isOpen())
+        		transport.close();
             e.printStackTrace();
         }
 

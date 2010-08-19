@@ -17,11 +17,11 @@ curl -O http://l2r.cs.uiuc.edu/~cogcomp/Software/LBJPOS.jar
 curl -O http://l2r.cs.uiuc.edu/~cogcomp/Software/LBJChunk.jar
 curl -O http://l2r.cs.uiuc.edu/~cogcomp/Software/LBJCoref.jar
 curl -O http://l2r.cs.uiuc.edu/~cogcomp/Software/illinois-ner-server-dependencies.tar.gz
-curl -O http://nlp.stanford.edu/software/stanford-parser-2010-07-09.tgz
+curl -O http://nlp.stanford.edu/software/stanford-parser-2010-08-16.tgz
 
 echo "Unpacking dependencies"
 tar xzf illinois-ner-server-dependencies.tar.gz
-tar xzf stanford-parser-2010-07-09.tgz
+tar xzf stanford-parser-2010-08-16.tgz
 
 echo "Moving dependencies"
 mkdir -p $LIBDIR
@@ -31,13 +31,13 @@ mv LBJChunk.jar $LIBDIR
 mv LBJCoref.jar $LIBDIR
 mv illinois-ner-server-dependencies/LBJ2Library-2.2.2.jar $LIBDIR
 mv illinois-ner-server-dependencies/LbjNerTagger.jar $LIBDIR
-mv stanford-parser-2010-07-09/stanford-parser-2010-07-09.jar $LIBDIR
+mv stanford-parser-2010-08-16/stanford-parser-2010-08-16.jar $LIBDIR
 
 echo "Moving model files and data"
 mkdir -p $NERDATADIR
 mkdir -p $STANFORDDATADIR
 mv illinois-ner-server-dependencies/ner $NERDATADIR
-mv stanford-parser-2010-07-09/englishPCFG.ser.gz $STANFORDDATADIR
+mv stanford-parser-2010-08-16/englishPCFG.ser.gz $STANFORDDATADIR
 
 echo "Cleaning up"
 cd $CURATOR_BASE
