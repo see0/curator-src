@@ -39,6 +39,7 @@ public class IllinoisChunkerHandler implements Labeler.Iface {
 	}
 	
 	public IllinoisChunkerHandler(String configFilename) {
+		tagger.discreteValue(new Token(new Word("The"), null, ""));
 		if (configFilename.trim().equals("")) {
 			configFilename = "configs/chunker.properties";
 		}
