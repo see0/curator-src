@@ -37,7 +37,9 @@ public class IllinoisPOSHandler implements Labeler.Iface {
 	}
 	
 	public IllinoisPOSHandler(String configFilename) {
+		logger.info("Loading POS model..");
 		tagger.discreteValue(new Token(new Word("The"), null, ""));
+		logger.info("POS Tagger ready");
 		if (configFilename.trim().equals("")) {
 			configFilename = "configs/pos.properties";
 		}
