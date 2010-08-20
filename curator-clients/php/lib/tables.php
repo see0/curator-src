@@ -105,57 +105,89 @@ function srl_to_table($record, $table, $col = 0) {
 	return $table;
 }
 
-//TODO: this needs updating to the new quantities labels!!!!
 function qty_to_table($record, $table, $col = 0) {
-	$text = $record->rawText;
-	$qtys = $record->labelViews["quantities"];
+        $text = $record->rawText;
+        $qtys = $record->labelViews["quantities"];
     $tokens = $record->labelViews["tokens"];
-	$start_idx = array();
-	$ends_idx = array();
-	$result = "";
-	$lbls = array('NUM' => "Numerical Phrase", 'TEMP' => "Temporal Phrase");
+        $start_idx = array();
+        $ends_idx = array();
+        $result = "";
+        $lbls = array('NUMBER' => "Numerical Phrase", 'DATE' => "Date Phrase", 'RANGE' => "Date Range");
 
-	// reverse the maps of the start and end indexes,
-	// these map to the word indices
-	foreach($tokens->labels as $i => $span) {
-		// fix the punctuation problem. (spans like ',' and '.' occupy the space before, instead of space after)
-		$ss = $span->start;
-		if($i > 0 && $tokens->labels[$i-1]->ending == $span->start) {
-			$ss = $span->start + 1;
-		}
-		$start_idx[$ss] = $i;
-		// for end positions, there seems to be a problem with text containing '--',
-		// so we'll generate the corresponding word index for each character position
-		for($j = $ss; $j <= $span->ending; $j++) {
-			$ends_idx[$j] = $i;
-		}
-	}
+        // reverse the maps of the start and end indexes,
+        // these map to the word indices
+        foreach($tokens->labels as $i => $span) {
+                // fix the punctuation problem. (spans like ',' and '.' occupy the space before, instead of space after)
+                $ss = $span->start;
+                if($i > 0 && $tokens->labels[$i-1]->ending == $span->start) {
+                        $ss = $span->start + 1;
+                }
+                $start_idx[$ss] = $i;
+                // for end positions, there seems to be a problem with text containing '--',
+                // so we'll generate the corresponding word index for each character position
+                for($j = $ss; $j <= $span->ending; $j++) {
+                        $ends_idx[$j] = $i;
+                }
+        }
 
-	// build a much easier quantity object
-	// qtyobj[ tree_id ][ start_word_id ] = span, span is an array of 'text', 'class', 'span' => Text visible, CSS class, # of rows spanned
-	$qtyobj = array();
-	foreach($qtys->labels as $i => $span) {
-		$qtyobj[$start_idx[$span->start]] = array('text' => $lbls[$span->label], 'class' => $span->label, 'span' => $ends_idx[$span->ending] - $start_idx[$span->start] + 1);
-	}
+        // build a much easier quantity object
+        // qtyobj[ tree_id ][ start_word_id ] = span, span is an array of 'text', 'class', 'span' => Text visible, CSS class, # of rows spanned
+        $qtyobj = array();
+        foreach($qtys->labels as $i => $span) {
+                $qtyobj[$start_idx[$span->start]] = array('text' => $lbls[$span->label], 'class' => $span->label, 'span' => $ends_idx[$span->ending] - $start_idx[$span->start] + 1, 'attributes' => $span->attributes);
+        }
 
-	$inspan = 0;
-	$table[0][$col] = "<td class=\"spacing\"><img id=\"qty\" onclick=\"toggle_col('qty');\" src=\"/images/collapse.gif\" /></td><td col=\"qty\" class=\"qty title\"><i>Quantities</i></td>";
-	foreach($tokens->labels as $j => $span) {
-		$table[$j+1][$col] = "<td class=\"spacing\"></td>";
-		if($inspan > 0) {
-			// in span, don't output a TD tag
-			$inspan--;
-			continue;
-		} else if(array_key_exists($j, $qtyobj)) {
-			// start of rowspan
-			$inspan = $qtyobj[$j]['span'] - 1;
-			$table[$j+1][$col] .= "<td col=\"qty\" class=\"qty inspan ".$qtyobj[$j]['class']."\" rowspan=\"".$qtyobj[$j]['span']."\">".$qtyobj[$j]['text']."</td>";
-		} else {
-			// nothing to put here
-			$table[$j+1][$col] .= "<td col=\"qty\" class=\"qty\"></td>";
-		}
+        $inspan = 0;
+        $table[0][$col] = "<td class=\"spacing\"><img id=\"qty\" onclick=\"toggle_col('qty');\" src=\"/images/collapse.gif\" /></td><td col=\"qty\" class=\"qty title\"><i>Quantities</i></td>";
+        foreach($tokens->labels as $j => $span) {
+                $table[$j+1][$col] = "<td class=\"spacing\"></td>";
+                if($inspan > 0) {
+                        // in span, don't output a TD tag
+                        $inspan--;
+                        continue;
+                } else if(array_key_exists($j, $qtyobj)) {
+                        // start of rowspan
+                        $inspan = $qtyobj[$j]['span'] - 1;
+                        $table[$j+1][$col] .= "<td col=\"qty\" id=\"$j\" class=\"qty inspan ".$qtyobj[$j]['class']."\" rowspan=\"".$qtyobj[$j]['span']."\">".$qtyobj[$j]['text']."<div style=\"display: none\" id=\"qty_hover_$j\">".qty_description($qtyobj[$j]['class'], $qtyobj[$j]['attributes'])."</div></td>";
+                } else {
+                        // nothing to put here
+                        $table[$j+1][$col] .= "<td col=\"qty\" class=\"\"></td>";
+                }
+        }
+        return $table;
+}
+
+function qty_description($label, $attributes) {
+	$lbls = array('NUMBER' => "Numerical Phrase", 'DATE' => "Date Phrase", 'RANGE' => "Date Range");
+	$text = "<h3 style=\"padding: 0px\">".$lbls[$label]."</h3><table cellspacing=5 cellpadding=0 border=0>";
+	
+	if($label == "RANGE") {
+		$text .= "<tr><td class=\"qtyAttribute\">Start Day:</td><td class=\"qtyValue\">".$attributes["start_day"]."</td></tr>";
+                $text .= "<tr><td class=\"qtyAttribute\">Start Month:</td><td class=\"qtyValue\">".$attributes["start_month"]."</td></tr>";
+                $text .= "<tr><td class=\"qtyAttribute\">Start Year:</td><td class=\"qtyValue\">".$attributes["start_year"]."</td></tr>";
+                $text .= "<tr><td class=\"qtyAttribute\">Start Units:</td><td class=\"qtyValue\">".$attributes["start_units"]."</td></tr>";
+                $text .= "<tr><td class=\"qtyAttribute\">Start Bound:</td><td class=\"qtyValue\">".$attributes["start_bound"]."</td></tr>";
+
+		$text .= "<tr><td class=\"qtyAttribute\">End Day:</td><td class=\"qtyValue\">".$attributes["end_day"]."</td></tr>";
+                $text .= "<tr><td class=\"qtyAttribute\">End Month:</td><td class=\"qtyValue\">".$attributes["end_month"]."</td></tr>";
+                $text .= "<tr><td class=\"qtyAttribute\">End Year:</td><td class=\"qtyValue\">".$attributes["end_year"]."</td></tr>";
+                $text .= "<tr><td class=\"qtyAttribute\">End Units:</td><td class=\"qtyValue\">".$attributes["end_units"]."</td></tr>";
+                $text .= "<tr><td class=\"qtyAttribute\">End Bound:</td><td class=\"qtyValue\">".$attributes["end_bound"]."</td></tr>";
 	}
-	return $table;
+	elseif($label == "DATE") {
+		$text .= "<tr><td class=\"qtyAttribute\">Day:</td><td class=\"qtyValue\">".$attributes["day"]."</td></tr>";
+                $text .= "<tr><td class=\"qtyAttribute\">Month:</td><td class=\"qtyValue\">".$attributes["month"]."</td></tr>";
+		$text .= "<tr><td class=\"qtyAttribute\">Year:</td><td class=\"qtyValue\">".$attributes["year"]."</td></tr>";
+                $text .= "<tr><td class=\"qtyAttribute\">Units:</td><td class=\"qtyValue\">".$attributes["units"]."</td></tr>";
+                $text .= "<tr><td class=\"qtyAttribute\">Bound:</td><td class=\"qtyValue\">".$attributes["bound"]."</td></tr>";
+	}
+	elseif($label == "NUMBER") {
+		$text .= "<tr><td class=\"qtyAttribute\">Value:</td><td class=\"qtyValue\">".$attributes["value"]."</td></tr>";
+                $text .= "<tr><td class=\"qtyAttribute\">Units:</td><td class=\"qtyValue\">".$attributes["units"]."</td></tr>";
+                $text .= "<tr><td class=\"qtyAttribute\">Bound:</td><td class=\"qtyValue\">".$attributes["bound"]."</td></tr>";
+	}
+	$text .= "</table>";
+	return $text;
 }
 
 function ner_to_table($record, $table, $col = 0) {
@@ -233,6 +265,7 @@ function nom_to_table($record, $table, $col = 0) {
 		}
 	}
 
+	$treeobj = array();
 	foreach($forest->trees as $i => $tree) {
 		$nodes = $tree->nodes;
 		$top = $nodes[$tree->top];

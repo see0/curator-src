@@ -40,10 +40,10 @@ function perform() {
 
     try {
         $hostname = $curator_hostname;
-        $port = $curator_port;
+        $c_port = $curator_port;
             
         $timeout = 300;
-        $socket = new TSocket($hostname, $port);
+        $socket = new TSocket($hostname, $c_port);
         $socket->setRecvTimeout($timeout*1000);
         $transport = new TBufferedTransport($socket, 1024, 1024);
         $transport = new TFramedTransport($transport);
