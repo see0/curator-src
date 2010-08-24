@@ -15,5 +15,5 @@ CLASSPATH=$COMPONENT_CLASSPATH:$LIB_CLASSPATH
 
 cd $CURATOR_BASE
 echo java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx4000m edu.illinois.cs.cogcomp.curator.CuratorServer $@
-java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx4000m edu.illinois.cs.cogcomp.curator.CuratorServer $@
+exec java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx4000m edu.illinois.cs.cogcomp.curator.CuratorServer $@
 cd $START

@@ -15,5 +15,5 @@ CLASSPATH=$COMPONENT_CLASSPATH:$LIB_CLASSPATH
 
 cd $CURATOR_BASE
 echo java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx256m edu.illinois.cs.cogcomp.annotation.server.IllinoisTokenizerServer $@
-java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx256m edu.illinois.cs.cogcomp.annotation.server.IllinoisTokenizerServer $@
+exec java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx256m edu.illinois.cs.cogcomp.annotation.server.IllinoisTokenizerServer $@
 cd $START

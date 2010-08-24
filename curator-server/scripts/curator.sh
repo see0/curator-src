@@ -15,5 +15,5 @@ CLASSPATH=$COMPONENT_CLASSPATH:$LIB_CLASSPATH
 
 cd $CURATOR_BASE
 echo java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx512m edu.illinois.cs.cogcomp.curator.CuratorServer --config configs/curator.properties $@
-java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx512m edu.illinois.cs.cogcomp.curator.CuratorServer --config configs/curator.properties $@
+exec java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx512m edu.illinois.cs.cogcomp.curator.CuratorServer --config configs/curator.properties $@
 cd $START

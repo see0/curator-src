@@ -15,5 +15,5 @@ CLASSPATH=$COMPONENT_CLASSPATH:$LIB_CLASSPATH
 
 cd $CURATOR_BASE
 echo java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx1G edu.illinois.cs.cogcomp.annotation.server.StanfordParserServer $@
-java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx1G edu.illinois.cs.cogcomp.annotation.server.StanfordParserServer $@
+exec java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx1G edu.illinois.cs.cogcomp.annotation.server.StanfordParserServer $@
 cd $START

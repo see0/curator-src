@@ -17,5 +17,5 @@ CLASSPATH=$COMPONENT_CLASSPATH:$LIB_CLASSPATH:$NER_CLASSPATH
 
 cd $CURATOR_BASE
 echo java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx2G edu.illinois.cs.cogcomp.annotation.server.IllinoisNERServer $@
-java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx2G edu.illinois.cs.cogcomp.annotation.server.IllinoisNERServer $@
+exec java -cp $CLASSPATH -Dhome=$CURATOR_BASE -Xmx2G edu.illinois.cs.cogcomp.annotation.server.IllinoisNERServer $@
 cd $START

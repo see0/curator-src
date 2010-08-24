@@ -12,7 +12,7 @@
   
   <target name="resolve" description="retrieve dependencies with ivy" depends="init-ivy">
     <ivy:resolve file="ivy.xml" />
-    <ivy:retrieve pattern="${curator-lib}/[artifact]-[revision].[ext]" />
+    <ivy:retrieve pattern="${curator.lib}/[artifact]-[revision].[ext]" />
     <ivy:cachepath pathid="dependencies.classpath" useOrigin="true"/>
   </target>
 
