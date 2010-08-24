@@ -1,0 +1,18 @@
+Curator Architecture Source
+===========================
+
+This package contains the source code for the Curator architecture, Curator
+server and several annotation servers.  It is structured as follows:
+
+* `curator-interfaces` contains the Thrift definition files used by the
+  Curator Architecture.
+* `curator-server` the source code and build scripts for the Curator server.
+* `curator-annotators` source code and build scripts for various annotation
+  servers.
+* `curator-clients` example client code for connecting to a Curator server and
+  manipulating the data structures.
+* `resources` files required to build the Curator distribution.
+* `lib` external libraries.
+
+See the Curator homepage <http://cogcomp.cs.illinois.edu/curator> for more
+information.
