@@ -608,6 +608,8 @@ public class CuratorHandler implements Curator.Iface {
 				if (client != null)
 					pool.releaseClient(client);
 				// propagate error to calling client
+				logger.warn("Unhandled TException (probably a problem in the underlying annotator");
+				logger.warn("Input sentence: {}", record.getRawText());
 				if (e.getCause() != null) {
 					logger.warn("{} : {}", view_name, e.getCause().toString());
 					throw new ServiceUnavailableException(view_name
