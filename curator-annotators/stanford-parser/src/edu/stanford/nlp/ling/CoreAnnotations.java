@@ -103,6 +103,29 @@ public class CoreAnnotations {
   }
 
   /**
+   * The CoreMap key for getting the token-level true case annotation (e.g., INIT_UPPER)
+   *
+   * This key is typically set on token annotations.
+   */
+  public static class TrueCaseAnnotation implements CoreAnnotation<String> {
+    public Class<String> getType() {
+      return String.class;
+    }
+  }
+
+  /**
+   * The CoreMap key identifying the annotation's true-cased text.
+   *
+   * Note that this key is intended to be used with many different kinds of
+   * annotations - documents, sentences and tokens all have their own text.
+   */
+  public static class TrueCaseTextAnnotation implements CoreAnnotation<String> {
+    public Class<String> getType() {
+      return String.class;
+    }
+  }
+
+  /**
    * The CoreMap key for getting the tokens contained by an annotation.
    *
    * This key should be set for any annotation that contains tokens.
@@ -830,13 +853,12 @@ public class CoreAnnotations {
     public Class<Pair<String, Double>> getType() {  return (Class) Pair.class; } }
 
   /**
-   * Used in nlp.trees
+   * Used in nlp.trees.  When nodes are duplicated in Stanford Dependencies
+   * conversion (to represent conjunction of PPs with preposition collapsing,
+   * this gets set to a positive number on duplicated nodes.
    */
-  public static class CopyAnnotation implements CoreAnnotation<Boolean> {
-    public Class<Boolean> getType() {  return Boolean.class; } }
-
-  public static class ValueLabelAnnotation implements CoreAnnotation<Label> {
-    public Class<Label> getType() {  return Label.class; } }
+  public static class CopyAnnotation implements CoreAnnotation<Integer> {
+    public Class<Integer> getType() {  return Integer.class; } }
 
   /** Used in SimpleXMLAnnotator. The value is an XML element name String for
    *  the innermost element in which this token was contained.
@@ -844,5 +866,3 @@ public class CoreAnnotations {
   public static class XmlElementAnnotation implements CoreAnnotation<String> {
     public Class<String> getType() {  return String.class; } }
 }
-
-

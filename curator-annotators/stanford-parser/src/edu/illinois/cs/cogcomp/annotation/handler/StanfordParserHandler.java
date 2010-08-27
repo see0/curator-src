@@ -23,7 +23,7 @@ import edu.illinois.cs.cogcomp.thrift.base.Span;
 import edu.illinois.cs.cogcomp.thrift.base.Tree;
 import edu.illinois.cs.cogcomp.thrift.curator.Record;
 import edu.illinois.cs.cogcomp.thrift.parser.MultiParser;
-import edu.stanford.nlp.ling.CoreAnnotations.CopyAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.Sentence;
 import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
@@ -265,10 +265,13 @@ public class StanfordParserHandler implements MultiParser.Iface {
 			int hpos = td.gov().index() - 1;
 			int dpos = td.dep().index() - 1;
 			
-			boolean hcopy = td.gov().label().get(CopyAnnotation.class) != null
-					&& td.gov().label().get(CopyAnnotation.class);
-			boolean dcopy = td.dep().label().get(CopyAnnotation.class) != null
-					&& td.dep().label().get(CopyAnnotation.class);
+			Integer hcopy = td.gov().label().get(CoreAnnotations.CopyAnnotation.class);
+			Integer dcopy = td.dep().label().get(CoreAnnotations.CopyAnnotation.class);
+			
+//			boolean hcopy = td.gov().label().get(CopyAnnotation.class) != null
+//					&& td.gov().label().get(CopyAnnotation.class);
+//			boolean dcopy = td.dep().label().get(CopyAnnotation.class) != null
+//					&& td.dep().label().get(CopyAnnotation.class);
 
 			if (hpos == dpos) {
 				logger.debug("hcopy: {}", hcopy);
@@ -278,7 +281,7 @@ public class StanfordParserHandler implements MultiParser.Iface {
 			int depNodePos;
 			Node headNode;
 			Node depNode;
-			if (hcopy) {
+			if (hcopy != null) {
 				nodeMap = copyNodeMap;
 			} else {
 				nodeMap = mainNodeMap;
@@ -290,9 +293,9 @@ public class StanfordParserHandler implements MultiParser.Iface {
 				headNode = new Node();
 				headNode.setLabel("dependency node");
 				Span headSpan = wordToSpan(sentence.get(hpos), offset);
-				if (hcopy) {
+				if (hcopy != null) {
 					headSpan.setAttributes(new HashMap<String, String>());
-					headSpan.getAttributes().put("copy", "true");
+					headSpan.getAttributes().put("copy", String.valueOf(hcopy));
 				}
 				headNode.setSpan(headSpan);
 				nodes.add(headNode);
@@ -300,7 +303,7 @@ public class StanfordParserHandler implements MultiParser.Iface {
 						.size() - 1));
 			}
 			
-			if (dcopy) {
+			if (dcopy != null) {
 				nodeMap = copyNodeMap;
 			} else {
 				nodeMap = mainNodeMap;
@@ -313,9 +316,9 @@ public class StanfordParserHandler implements MultiParser.Iface {
 				depNode = new Node();
 				depNode.setLabel("dependency node");
 				Span dependentSpan = wordToSpan(sentence.get(dpos), offset);
-				if (dcopy) {
+				if (dcopy != null) {
 					dependentSpan.setAttributes(new HashMap<String, String>());
-					dependentSpan.getAttributes().put("copy", "true");
+					dependentSpan.getAttributes().put("copy", String.valueOf(dcopy));
 				}
 				depNode.setSpan(dependentSpan);
 				nodes.add(depNode);

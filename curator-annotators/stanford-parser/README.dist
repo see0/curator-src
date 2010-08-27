@@ -28,9 +28,9 @@ The Node object contains the dependency information in the following fields:
 * `node.children` map indicies (positions in tree.nodes) to dependency
   labels. (i.e., subj, det, etc).
 * `node.label` is always the string "dependency node".
-* `node.span.attributes` map may contain a key "copy" with value "true" if this
-  node is a copy of another node covering the same span. See the Stanford
-  Dependency Manual pg 13.
+* `node.span.attributes` map may contain a key "copy" with value equal to the
+  copy number if this node is a copy of another node covering the same span. See
+  the Stanford Dependency Manual pg 13.
 
 Usage
 -----
