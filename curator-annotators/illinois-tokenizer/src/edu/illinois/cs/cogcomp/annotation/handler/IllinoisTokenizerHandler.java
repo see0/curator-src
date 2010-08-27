@@ -34,6 +34,9 @@ public class IllinoisTokenizerHandler implements MultiLabeler.Iface {
 		List<Span> sentences = new ArrayList<Span>();
 		for (Sentence s : splitter.splitAll()) {
 			LinkedVector words = s.wordSplit();
+			if (s.end >= record.getRawText().length()) {
+				throw new AnnotationFailedException("Error in tokenizer, sentence end greater than rawtext length");
+			}
 			for (int i = 0; i < words.size(); i++) {
 				Word word = (Word) words.get(i);
 				Span token = new Span();

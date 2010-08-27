@@ -39,7 +39,7 @@
   <macrodef name="annotator-doc">
     <attribute name="annotator" default="NOT SET"/>
     <sequential>
-      <md-doc infile="${dist.doc}/README.@{annotator}" outfile="${web.servers}/README.@{annotator}.html" />
+      <md-doc infile="${dist.doc}/README.@{annotator}" outfile="${web.servers}/@{annotator}.README.html" />
     </sequential>
   </macrodef>
 

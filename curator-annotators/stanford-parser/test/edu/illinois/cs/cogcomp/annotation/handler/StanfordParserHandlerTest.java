@@ -76,5 +76,26 @@ public class StanfordParserHandlerTest {
 		//TODO: Make this into a assert and hope it all works
 		System.out.println(forests);
 	}
+	
+	@Test
+	public void testRegression2() throws AnnotationFailedException, TException {
+		String text = "-LRB- In a stock-index arbitrage sell program , traders buy or sell big baskets of stocks and offset the trade in futures to lock in a price difference . -RRB-";
+		int[] sentenceOffsets = {0,159};
+		int[] tokenOffsets = {0,1,1,4,4,5,6,8,9,10,11,22,23,32,33,37,38,45,46,47,48,55,56,59,60,62,63,67,68,71,72,79,80,82,83,89,90,93,94,100,101,104,105,110,111,113,114,121,122,124,125,129,130,132,133,134,135,140,141,151,152,153,154,155,155,158,158,159};
+		List<Span> sentences = buildSpans(sentenceOffsets);
+		Labeling slabeling = new Labeling(sentences);
+		List<Span> tokens = buildSpans(tokenOffsets);
+		Labeling tlabeling = new Labeling(tokens);
+		
+		Record r = new Record();
+		r.setRawText(text);
+		r.setLabelViews(new HashMap<String, Labeling>());
+		r.getLabelViews().put("sentences", slabeling);
+		r.getLabelViews().put("tokens", tlabeling);
+		
+		List<Forest> forests = handler.parseRecord(r);
+		//TODO: Make this into a assert and hope it all works
+		System.out.println(forests);
+	}
 
 }
