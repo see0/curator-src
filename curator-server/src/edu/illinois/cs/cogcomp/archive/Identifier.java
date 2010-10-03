@@ -94,13 +94,13 @@ public class Identifier {
 		return null;
 	}
 
-	public static String getId(TBase datum) throws TException {
+	public static String getId(TBase datum) throws ArchiveException {
 		if (datum instanceof Record) {
 			return getId((Record) datum);
 		} else if (datum instanceof MultiRecord) {
 			return getId((MultiRecord) datum);
 		} else {
-			throw new TException("Unexpected data type!");
+			throw new ArchiveException("Unexpected data type!");
 		}
 	}
 

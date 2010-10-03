@@ -13,7 +13,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.thrift.TBase;
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,7 +115,7 @@ public class DatabaseArchive implements Archive {
 		logger.info("Database initialized.");
 	}
 
-	public boolean close() throws TException {
+	public boolean close() throws ArchiveException {
 		updateRecordAccess();
 		for (DatabaseStore store : stores.values()) {
 			logger.info(store.getStatusReport());
@@ -124,40 +123,40 @@ public class DatabaseArchive implements Archive {
 		try {
 			db.close();
 		} catch (SQLException e) {
-			throw new TException("Error closing database", e);
+			throw new ArchiveException("Error closing database", e);
 		}
 		logger.info("Database connection closed.");
 		return true;
 	}
 
-	public synchronized <T extends TBase> T getById(String identifier, Class<T> clazz) throws TException {
+	public synchronized <T extends TBase> T getById(String identifier, Class<T> clazz) throws ArchiveException {
 		DatabaseStore store = stores.get(clazz);
 		T datum = store.getById(identifier, clazz);
 		return datum;
 	}
 
 	public synchronized <T extends TBase> T get(String text, boolean ws, Class<T> clazz)
-			throws TException {
+			throws ArchiveException {
 		return getById(Identifier.getId(text, ws), clazz);
 	}
 
 	public synchronized <T extends TBase> T get(List<String> text, Class<T> clazz)
-			throws TException {
+			throws ArchiveException {
 		return getById(Identifier.getId(text), clazz);
 	}
 
-	public synchronized <T extends TBase> boolean store(T datum, Class<T> clazz) throws TException {
+	public synchronized <T extends TBase> boolean store(T datum, Class<T> clazz) throws ArchiveException {
 		DatabaseStore store = stores.get(clazz);
 		return store.store(datum, clazz);
 	}
 
-	public void updateRecordAccess() throws TException {
+	public void updateRecordAccess() throws ArchiveException {
 		logger.info("Updating access times on data");
 		for (DatabaseStore store : stores.values())
 			store.updateAccess();
 	}
 
-	public void expireRecords(long expireAge) throws TException {
+	public void expireRecords(long expireAge) throws ArchiveException {
 		for (DatabaseStore store : stores.values())
 			store.expire(expireAge);
 	}
@@ -178,7 +177,7 @@ class ShutdownListener implements Runnable {
 	public void run() {
 		try {
 			dba.close();
-		} catch (TException e) {
+		} catch (ArchiveException e) {
 			dba.logger.error("Exception closing database.", e);
 		}
 	}
@@ -220,7 +219,7 @@ class DatabaseAccessListener implements Observer, Runnable {
 	public void run() {
 		try {
 			dbs.updateAccess();
-		} catch (TException e) {
+		} catch (ArchiveException e) {
 			dbs.logger.error("Error updating record access.", e);
 		}
 		isRunning = false;
@@ -257,7 +256,7 @@ class DatabaseMaintenanceWorker implements Runnable {
 				try {
 					dba.updateRecordAccess();
 					dba.expireRecords(expireAge);
-				} catch (TException e) {
+				} catch (ArchiveException e) {
 					logger.error("Error performing maintenance.", e);
 				}
 				logger.info("Maintenance complete.");

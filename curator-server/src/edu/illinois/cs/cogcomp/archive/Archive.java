@@ -11,15 +11,61 @@ import org.apache.thrift.TException;
  * @author James Clarke
  * 
  */
+/**
+ * @author james
+ *
+ */
 public interface Archive {
 
-	public <T extends TBase> T get(String text, boolean ws, Class<T> clazz) throws TException;
+
+	/**
+	 * Retrieve a <code>T</code> representing the text String and whether the text
+	 * is whitespace tokenized.
+	 * @param <T> Generic to return
+	 * @param text String of text
+	 * @param ws true if text is whitespace tokenized
+	 * @param clazz class to return
+	 * @return
+	 * @throws ArchiveException
+	 */
+	public <T extends TBase> T get(String text, boolean ws, Class<T> clazz) throws ArchiveException;
 	
-	public <T extends TBase> T get(List<String> text, Class<T> clazz) throws TException;
+	/**
+	 * Retrieve a <code>T</code> representing the List of String texts
+	 * @param <T> Generic to return
+	 * @param text String of text
+	 * @param clazz class to return
+	 * @return
+	 * @throws ArchiveException
+	 */
+	public <T extends TBase> T get(List<String> text, Class<T> clazz) throws ArchiveException;
 	
-	public <T extends TBase> boolean store(T datum, Class<T> clazz) throws TException;
 	
-	public <T extends TBase> T getById(String identifier, Class<T> clazz) throws TException;
+	/**
+	 * Store a <code>T</code> datum in the archive. Class is the type of <code>T</code>.
+	 * @param <T>
+	 * @param datum
+	 * @param clazz
+	 * @return
+	 * @throws ArchiveException
+	 */
+	public <T extends TBase> boolean store(T datum, Class<T> clazz) throws ArchiveException;
 	
-	public boolean close() throws TException;
+	
+	/**
+	 * Retrieve a <code>T</code> represented by the identifier.
+	 * @param <T>
+	 * @param identifier
+	 * @param clazz
+	 * @return
+	 * @throws ArchiveException
+	 */
+	public <T extends TBase> T getById(String identifier, Class<T> clazz) throws ArchiveException;
+	
+	/**
+	 * Some archive implementations may need to be closed.
+	 * @return
+	 * @throws TException
+	 */
+	public boolean close() throws ArchiveException;
 }

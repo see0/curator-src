@@ -99,11 +99,16 @@ public class DatabaseStore extends Observable {
 		logger.info("Database Store {} initialized.", tableName);
 	}
 
-	private byte[] serialize(TBase datum) throws TException {
-		return serializer.serialize(datum);
+	private byte[] serialize(TBase datum) throws ArchiveException {
+			try {
+				return serializer.serialize(datum);
+			} catch (TException e) {
+				e.printStackTrace();
+				throw new ArchiveException("Problem serializing data", e);
+			}
 	}
 
-	private <T extends TBase> T deserialize(byte[] bytes, Class<T> clazz) throws TException {
+	private <T extends TBase> T deserialize(byte[] bytes, Class<T> clazz) throws ArchiveException {
 		T datum = null;
 		try {
 			datum = clazz.newInstance();
@@ -114,11 +119,16 @@ public class DatabaseStore extends Observable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		deserializer.deserialize(datum, bytes);
+		try {
+			deserializer.deserialize(datum, bytes);
+		} catch (TException e) {
+			e.printStackTrace();
+			throw new ArchiveException("Problem serializing data", e);
+		}
 		return datum;
 	}
 
-	public synchronized <T extends TBase> boolean store(T datum, Class<T> clazz) throws TException {
+	public synchronized <T extends TBase> boolean store(T datum, Class<T> clazz) throws ArchiveException {
 		long startTime = System.currentTimeMillis();
 		String identifier = Identifier.getId(datum);
 		long time = System.currentTimeMillis();
@@ -152,11 +162,11 @@ public class DatabaseStore extends Observable {
 			return result;
 		} catch (SQLException e) {
 			logger.warn("Error creating prepared statements", e);
-			throw new TException("Error storing datum", e);
-		}
+			throw new ArchiveException("Error storing datum", e);
+		} 
 	}
 
-	public synchronized <T extends TBase> T getById(String identifier, Class<T> clazz) throws TException {
+	public synchronized <T extends TBase> T getById(String identifier, Class<T> clazz) throws ArchiveException {
 		long startTime = System.currentTimeMillis();
 		final ResultSet rs;
 		T datum = null;
@@ -167,6 +177,7 @@ public class DatabaseStore extends Observable {
 			if (rs.next()) {
 				Blob blob = rs.getBlob("datum");
 				datum = deserialize(blob.getBytes(0, (int) blob.length()), clazz);
+
 
 				// update access log
 				accessLog.put(identifier, System.currentTimeMillis());
@@ -183,7 +194,7 @@ public class DatabaseStore extends Observable {
 		} catch (SQLException e) {
 			logger.warn("Error creating prepared statements", e);
 			logger.error("Error getting datum for identifier: {}", identifier);
-			throw new TException("Underlying database error", e);
+			throw new ArchiveException("Underlying database error", e);
 		}
 		return datum;
 	}
@@ -194,7 +205,7 @@ public class DatabaseStore extends Observable {
 	 * 
 	 * @throws TException
 	 */
-	public synchronized void updateAccess() throws TException {
+	public synchronized void updateAccess() throws ArchiveException {
 		long startTime = System.currentTimeMillis();
 		Set<String> doneIdents = new HashSet<String>();
 		for (String identifier : accessLog.keySet()) {
@@ -207,7 +218,7 @@ public class DatabaseStore extends Observable {
 				doneIdents.add(identifier);
 			} catch (SQLException e) {
 				logger.warn("Error creating prepared statements", e);
-				throw new TException("Underlying database error", e);
+				throw new ArchiveException("Underlying database error", e);
 			}
 		}
 		for (String ident : doneIdents) {
@@ -225,7 +236,7 @@ public class DatabaseStore extends Observable {
 	 * @param expireAge
 	 * @throws TException
 	 */
-	public void expire(long expireAge) throws TException {
+	public void expire(long expireAge) throws ArchiveException {
 		try {
 			deleteStatement.clearParameters();
 			deleteStatement.setLong(1, System.currentTimeMillis() - expireAge);
@@ -233,7 +244,7 @@ public class DatabaseStore extends Observable {
 			logger.info("Deleted {} old items in {}", n, name);
 		} catch (SQLException e) {
 			logger.warn("Error creating prepared statements", e);
-			throw new TException("Underlying database error", e);
+			throw new ArchiveException("Underlying database error", e);
 		}
 	}
 

@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.illinois.cs.cogcomp.archive.Archive;
+import edu.illinois.cs.cogcomp.archive.ArchiveException;
 import edu.illinois.cs.cogcomp.archive.Identifier;
 import edu.illinois.cs.cogcomp.legacy.SRLHandler;
 import edu.illinois.cs.cogcomp.thrift.base.AnnotationFailedException;
@@ -419,7 +420,12 @@ public class CuratorHandler implements Curator.Iface {
 					"Cannot annotate the empty string");
 		}
 		logger.debug("Asking archive for record");
-		Record record = archive.get(text, whitespaced, Record.class);
+		Record record = null;
+		try {
+			record = archive.get(text, whitespaced, Record.class);
+		} catch (ArchiveException e1) {
+			logger.error("Error retrieving from Archive.", e1);
+		}
 		if (record == null) {
 			if (slave) {
 				Pair<TTransport, Object> tc = createClient(masterHost,
@@ -442,7 +448,11 @@ public class CuratorHandler implements Curator.Iface {
 				}
 				// salves should also store records when they request from
 				// master (cut down on comms)
-				archive.store(record, Record.class);
+				try {
+					archive.store(record, Record.class);
+				} catch (ArchiveException e) {
+					logger.error("Error writing to Archive.", e);
+				}
 			} else if (record == null) {
 				logger.debug("Created new record");
 				record = new Record();
@@ -453,9 +463,9 @@ public class CuratorHandler implements Curator.Iface {
 				record.setParseViews(new HashMap<String, Forest>());
 				record.setViews(new HashMap<String, View>());
 				record.setIdentifier(Identifier.getId(text, whitespaced));
-			} else {
-				logger.debug("Record provided by archive");
 			}
+		} else {
+			logger.debug("Record provided by archive");
 		}
 		removeStaleFields(record);
 		return record;
@@ -464,7 +474,12 @@ public class CuratorHandler implements Curator.Iface {
 	public Record getRecordById(String identifier)
 			throws ServiceUnavailableException, AnnotationFailedException,
 			TException {
-		Record record = archive.getById(identifier, Record.class);
+		Record record = null;
+		try {
+			record = archive.getById(identifier, Record.class);
+		} catch (ArchiveException e1) {
+			logger.error("Error retrieving from Archive.", e1);
+		}
 		if (record == null && slave) {
 			Pair<TTransport, Object> tc = createClient(masterHost, masterPort,
 					Curator.Client.class);
@@ -555,7 +570,11 @@ public class CuratorHandler implements Curator.Iface {
 	public void storeRecord(Record record) throws ServiceSecurityException,
 			TException {
 		if (slave || writeaccess) {
-			archive.store(record, Record.class);
+			try {
+				archive.store(record, Record.class);
+			} catch (ArchiveException e) {
+				logger.error("Error storing to Archive.", e);
+			}
 		} else {
 			throw new ServiceSecurityException(
 					"Curator does not support storeRecord");
@@ -657,7 +676,12 @@ public class CuratorHandler implements Curator.Iface {
 		counters.get(view_name).incrementAndGet();
 		timers.get(view_name).addAndGet((int) (endTime - startTime));
 		// finally store record
-		archive.store(record, Record.class);
+		
+		try {
+			archive.store(record, Record.class);
+		} catch (ArchiveException e) {
+			logger.error("Error storing the record.", e);
+		}
 	}
 
 	/**
@@ -857,7 +881,12 @@ public class CuratorHandler implements Curator.Iface {
 	public MultiRecord getMultiRecord(List<String> texts)
 			throws ServiceUnavailableException, TException,
 			AnnotationFailedException {
-		MultiRecord multiRec = archive.get(texts, MultiRecord.class);
+		MultiRecord multiRec = null;
+		try {
+			multiRec = archive.get(texts, MultiRecord.class);
+		} catch (ArchiveException e) {
+			logger.error("Error getting MultiRecord from Archive.", e);
+		}
 		if (multiRec == null) {
 			multiRec = new MultiRecord();
 			List<String> records = new ArrayList<String>();
@@ -867,7 +896,11 @@ public class CuratorHandler implements Curator.Iface {
 			}
 			multiRec.setRecords(records);
 			multiRec.setIdentifier(Identifier.getId(texts));
-			archive.store(multiRec, MultiRecord.class);
+			try {
+				archive.store(multiRec, MultiRecord.class);
+			} catch (ArchiveException e) {
+				logger.error("Error storing MultiRecord in Archive.", e);
+			}
 		}
 		removeStaleFields(multiRec);
 		return multiRec;
@@ -899,7 +932,11 @@ public class CuratorHandler implements Curator.Iface {
 	public void storeMultiRecord(MultiRecord record)
 			throws ServiceSecurityException, TException {
 		if (slave || writeaccess) {
-			archive.store(record, MultiRecord.class);
+			try {
+				archive.store(record, MultiRecord.class);
+			} catch (ArchiveException e) {
+				logger.error("Error storing MultiRecord in Archive");
+			}
 		} else {
 			throw new ServiceSecurityException(
 					"Curator does not support storeMultiRecord");
